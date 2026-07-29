@@ -68,39 +68,47 @@ class LearningScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                /// [Widget composition]
-                /// In Flutter, we build complex visual interfaces by combining simple, basic widgets.
-                /// Instead of coding a single massive grid widget from scratch, we compose the chessboard
-                /// by nesting smaller components: a Column contains Rows, which in turn contain ChessSquares.
+                /// [Looping in Flutter]
+                /// Since Flutter layouts are constructed as nested trees of widget objects, we can use Dart's
+                /// loop mechanisms directly inside our widget trees to generate arrays of child widgets dynamically.
                 ///
-                /// [Why reusable widgets make the board easy to build]
-                /// Building an 8x8 chessboard requires 64 squares. Without a reusable widget, we would need
-                /// to duplicate the Container, BoxDecoration, borders, and labels 64 times. By leveraging our
-                /// reusable `ChessSquare` class, we can construct the entire board dynamically using simple,
-                /// clean configurations.
+                /// [List.generate()]
+                /// A handy Dart constructor `List.generate(int length, Growable generator(int index))` that creates
+                /// a list of objects. It executes the generator function once for each index from `0` to `length - 1`,
+                /// outputting a list of widgets that Flutter renders sequentially.
                 ///
-                /// [Column]
-                /// A multi-child layout widget that arranges its children vertically from top to bottom.
-                /// Here, the Column stacks the 8 chessboard ranks (rows) vertically on top of each other.
+                /// [Dynamic widget creation]
+                /// Instead of hardcoding 64 separate [ChessSquare] widget calls in our source code, we use loops to
+                /// dynamically instantiate widgets. The layout engine renders these widgets based on loop-calculated
+                /// properties, saving manual typing and preventing errors.
                 ///
-                /// [Row]
-                /// A multi-child layout widget that arranges its children horizontally from left to right.
-                /// Here, each Row displays a single chess rank consisting of 8 horizontal ChessSquares.
+                /// [Why dynamic generation is better than writing 64 widgets manually]
+                /// 1. DRY (Don't Repeat Yourself): Reduces what would have been 1,000+ lines of duplicate container
+                ///    instantiation markup down to under 30 lines.
+                /// 2. Flexibility: If we want to change color logic, coordinates, or expand grid size (e.g., to 10x10),
+                ///    we update a single formula rather than refactoring 64 hardcoded objects.
+                /// 3. Readability: Keeps our visual widget tree clean and understandable.
                 ///
-                /// [Nested widgets]
-                /// Placing widgets inside other widgets (such as Rows inside a Column, and ChessSquares
-                /// inside those Rows) is called nesting. This forms the hierarchical parent-child relationships
-                /// that define Flutter's layout engine.
+                /// [Nested loops]
+                /// To build a two-dimensional 8x8 chessboard, we place one loop inside another.
+                /// - The outer loop runs 8 times to generate rows (representing ranks 8 down to 1).
+                /// - The inner loop runs 8 times inside each row to generate columns (representing files A to H).
+                /// This results in a total of 8 * 8 = 64 composed widgets.
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(8, (rankIndex) {
-                    // rankIndex: 0 (top row, rank 8) to 7 (bottom row, rank 1)
+                    /// [Index values]
+                    /// The generator function provides a 0-based integer index for each iteration.
+                    /// Here, `rankIndex` starts at `0` and runs to `7`. We map this to chess ranks:
+                    /// index 0 -> rank 8 (top row), index 7 -> rank 1 (bottom row).
                     final rank = 8 - rankIndex;
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(8, (fileIndex) {
-                        // fileIndex: 0 (A) to 7 (H)
+                        /// [Index values (inner loop)]
+                        /// `fileIndex` starts at `0` and runs to `7`. We map this to files using our list:
+                        /// index 0 -> file 'A' (left-most), index 7 -> file 'H' (right-most).
                         final file = files[fileIndex];
                         final label = '$file$rank';
 
