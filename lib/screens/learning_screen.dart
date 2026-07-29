@@ -30,69 +30,27 @@ class _LearningScreenState extends State<LearningScreen> {
   /// It is initialized to `null` to represent that no square is selected initially (which prints "None").
   String? selectedSquare;
 
-  /// [Helper methods]
-  /// A helper method is a function declared inside the state class to perform specific calculations
-  /// or lookups. Instead of cluttering our UI build tree with complex conditional logic,
-  /// we move that code into a helper function to keep the visual tree neat and maintainable.
+  /// [Two-dimensional lists]
+  /// A two-dimensional (2D) list is a list of lists, often used to represent a grid, table, or matrix in software.
+  /// The outer list contains rows, and each inner list contains columns representing individual cells.
   ///
-  /// [Why logic is separated from UI]
-  /// Separating logic from visual code makes UI rendering clean and decoupled. The build method
-  /// only describes *what layout to draw*, while the helper method calculates *what data to put in it*.
+  /// [Why data should be stored separately from UI]
+  /// By separating the board data state (`board`) from our layout rendering (`build` method), we follow the MVC
+  /// (Model-View-Controller) design pattern. The visual builder simply draws the squares without needing to calculate
+  /// where pieces go, making the code cleaner, less error-prone, testable, and highly scaling-friendly.
   ///
-  /// [Returning values]
-  /// Functions return values using the `return` keyword, passing calculated results back to the caller.
-  ///
-  /// [Why empty strings are useful]
-  /// We return an empty string `""` to represent empty chess squares. This acts as a standard sentinel
-  /// value that tells the ChessSquare widget to skip piece rendering and only draw coordinates.
-  String getPiece(int rankIndex, int fileIndex) {
-    // Ranks:
-    // rankIndex 0 represents Rank 8 (black back rank)
-    // rankIndex 1 represents Rank 7 (black pawn rank)
-    // rankIndex 2..5 represent empty squares (Ranks 6..3)
-    // rankIndex 6 represents Rank 2 (white pawn rank)
-    // rankIndex 7 represents Rank 1 (white back rank)
-    if (rankIndex == 0) {
-      // Black back rank pieces
-      switch (fileIndex) {
-        case 0:
-        case 7:
-          return '♜'; // Black Rook
-        case 1:
-        case 6:
-          return '♞'; // Black Knight
-        case 2:
-        case 5:
-          return '♝'; // Black Bishop
-        case 3:
-          return '♛'; // Black Queen
-        case 4:
-          return '♚'; // Black King
-      }
-    } else if (rankIndex == 1) {
-      return '♟'; // Black Pawn
-    } else if (rankIndex == 6) {
-      return '♙'; // White Pawn
-    } else if (rankIndex == 7) {
-      // White back rank pieces
-      switch (fileIndex) {
-        case 0:
-        case 7:
-          return '♖'; // White Rook
-        case 1:
-        case 6:
-          return '♘'; // White Knight
-        case 2:
-        case 5:
-          return '♗'; // White Bishop
-        case 3:
-          return '♕'; // White Queen
-        case 4:
-          return '♔'; // White King
-      }
-    }
-    return '';
-  }
+  /// [Rows and columns]
+  /// The matrix consists of 8 rows (representing ranks 8 down to 1) and 8 columns (representing files A to H).
+  final List<List<String>> board = const [
+    ['♜', '♞', '♝', '♛', '♚', '♝', '♞', '♜'], // Row 0 -> Rank 8 (Black back rank)
+    ['♟', '♟', '♟', '♟', '♟', '♟', '♟', '♟'], // Row 1 -> Rank 7 (Black pawns)
+    ['', '', '', '', '', '', '', ''],         // Row 2 -> Rank 6 (Empty)
+    ['', '', '', '', '', '', '', ''],         // Row 3 -> Rank 5 (Empty)
+    ['', '', '', '', '', '', '', ''],         // Row 4 -> Rank 4 (Empty)
+    ['', '', '', '', '', '', '', ''],         // Row 5 -> Rank 3 (Empty)
+    ['♙', '♙', '♙', '♙', '♙', '♙', '♙', '♙'], // Row 6 -> Rank 2 (White pawns)
+    ['♖', '♘', '♗', '♕', '♔', '♗', '♘', '♖'], // Row 7 -> Rank 1 (White back rank)
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -197,11 +155,20 @@ class _LearningScreenState extends State<LearningScreen> {
                         /// Since `selectedSquare` is a single variable, the comparison `selectedSquare == label`
                         /// can evaluate to `true` for at most one square at any given time. All other 63 squares
                         /// evaluate to `false` and render with standard black borders.
+
+                        /// [Accessing data using indexes]
+                        /// To get the correct chess piece for the square, we read directly from our matrix list using
+                        /// indices. The first index `rankIndex` selects the row, and the second index `fileIndex` selects
+                        /// the column within that row.
+                        ///
+                        /// [board[row][column]]
+                        /// Syntactically, `board[rankIndex][fileIndex]` queries the nested array. For example:
+                        /// `board[0][4]` evaluates to '♚' (Black King on E8), while `board[3][3]` evaluates to `""`.
                         return ChessSquare(
                           squareColor: squareColor,
                           label: label,
                           isSelected: selectedSquare == label,
-                          piece: getPiece(rankIndex, fileIndex),
+                          piece: board[rankIndex][fileIndex],
                           onTap: () {
                             // Clear any existing snack bars to prevent queueing delay
                             ScaffoldMessenger.of(context).clearSnackBars();
