@@ -119,9 +119,25 @@ class LearningScreen extends StatelessWidget {
                         final isDark = (rankIndex + fileIndex) % 2 != 0;
                         final squareColor = isDark ? Colors.brown : Colors.white;
 
+                        /// [Anonymous functions]
+                        /// Here, we pass an anonymous function `() { ... }` directly to the `onTap` parameter.
+                        /// This is a callback function that is not declared beforehand, acting as an event listener.
+                        /// When the ChessSquare is tapped, it invokes this function to display the SnackBar.
                         return ChessSquare(
                           squareColor: squareColor,
                           label: label,
+                          onTap: () {
+                            // Clear any existing snack bars to prevent queueing delay
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            
+                            // Show a sliding notification with the tapped square coordinates.
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('You tapped $label'),
+                                duration: const Duration(seconds: 1),
+                              ),
+                            );
+                          },
                         );
                       }),
                     );

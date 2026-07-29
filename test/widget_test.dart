@@ -47,6 +47,13 @@ void main() {
     expect(find.text('A8'), findsOneWidget);
     expect(find.text('H8'), findsOneWidget);
 
+    // Test tapping a chess square triggers the callback and shows a SnackBar
+    final d4Square = find.text('D4');
+    await tester.ensureVisible(d4Square);
+    await tester.tap(d4Square);
+    await tester.pump(); // Start SnackBar animation
+    expect(find.text('You tapped D4'), findsOneWidget);
+
     // Verify a separate ProgressCard is drawn on LearningScreen starting at 0.
     expect(find.text('Completed Lessons: 0'), findsOneWidget);
 
