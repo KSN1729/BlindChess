@@ -47,11 +47,40 @@ void main() {
     expect(find.text('♙'), findsNWidgets(8)); // 8 White Pawns
     expect(find.text('♟'), findsNWidgets(8)); // 8 Black Pawns
 
-    // Verify the four corners of the board are rendered correctly
-    expect(find.text('A1'), findsOneWidget);
-    expect(find.text('H1'), findsOneWidget);
-    expect(find.text('A8'), findsOneWidget);
-    expect(find.text('H8'), findsOneWidget);
+    // Verify the corners of the board in White's perspective (indices: 0 = top-left, 7 = top-right, 56 = bottom-left, 63 = bottom-right)
+    List<ChessSquare> getChessSquares() {
+      return tester.widgetList<ChessSquare>(find.byType(ChessSquare)).toList();
+    }
+
+    expect(getChessSquares()[0].label, 'A8');
+    expect(getChessSquares()[0].piece, '♜');
+    expect(getChessSquares()[7].label, 'H8');
+    expect(getChessSquares()[7].piece, '♜');
+    expect(getChessSquares()[56].label, 'A1');
+    expect(getChessSquares()[56].piece, '♖');
+    expect(getChessSquares()[63].label, 'H1');
+    expect(getChessSquares()[63].piece, '♖');
+
+    // Tap Flip Board button to swap to Black's perspective
+    final flipButton = find.widgetWithText(ElevatedButton, 'Flip Board');
+    expect(flipButton, findsOneWidget);
+    await tester.ensureVisible(flipButton);
+    await tester.tap(flipButton);
+    await tester.pumpAndSettle();
+
+    // Verify the corners of the board in Black's perspective
+    expect(getChessSquares()[0].label, 'H1');
+    expect(getChessSquares()[0].piece, '♖');
+    expect(getChessSquares()[7].label, 'A1');
+    expect(getChessSquares()[7].piece, '♖');
+    expect(getChessSquares()[56].label, 'H8');
+    expect(getChessSquares()[56].piece, '♜');
+    expect(getChessSquares()[63].label, 'A8');
+    expect(getChessSquares()[63].piece, '♜');
+
+    // Flip back to White's perspective for the remainder of the test
+    await tester.tap(flipButton);
+    await tester.pumpAndSettle();
 
     // Verify that the initial selection text is "None"
     expect(find.text('Selected Square:'), findsOneWidget);

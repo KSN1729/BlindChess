@@ -25,6 +25,11 @@ class _LearningScreenState extends State<LearningScreen> {
   // List of files (columns) from A to H to map files to indices.
   final files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
+  /// [Boolean variables]
+  /// A boolean is a primitive data type that holds one of two possible values: `true` or `false`.
+  /// Here, `isWhitePerspective` keeps track of the active board view orientation.
+  bool isWhitePerspective = true;
+
   /// [selectedSquare variable]
   /// A mutable state variable that holds the coordinate label of the currently selected chess square (e.g., "E4").
   /// It is initialized to `null` to represent that no square is selected initially (which prints "None").
@@ -96,6 +101,21 @@ class _LearningScreenState extends State<LearningScreen> {
                 ),
                 const SizedBox(height: 12),
 
+                /// [Flip Board Button]
+                /// Toggling the perspective state triggers a UI rebuild using setState().
+                ElevatedButton(
+                  onPressed: () {
+                    /// [setState()]
+                    /// We use setState() to inform the Flutter framework that a state variable (isWhitePerspective)
+                    /// has changed, prompting it to call the build method again to redraw the chessboard.
+                    setState(() {
+                      isWhitePerspective = !isWhitePerspective;
+                    });
+                  },
+                  child: const Text('Flip Board'),
+                ),
+                const SizedBox(height: 12),
+
                 /// [Looping in Flutter]
                 /// Since Flutter layouts are constructed as nested trees of widget objects, we can use Dart's
                 /// loop mechanisms directly inside our widget trees to generate arrays of child widgets dynamically.
@@ -125,19 +145,22 @@ class _LearningScreenState extends State<LearningScreen> {
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: List.generate(8, (rankIndex) {
-                    /// [Index values]
-                    /// The generator function provides a 0-based integer index for each iteration.
-                    /// Here, `rankIndex` starts at `0` and runs to `7`. We map this to chess ranks:
-                    /// index 0 -> rank 8 (top row), index 7 -> rank 1 (bottom row).
-                    final rank = 8 - rankIndex;
+                    /// [Reversing row indexes]
+                    /// Under White's perspective, row index 0 displays Rank 8 (top row) and row index 7 displays Rank 1 (bottom row).
+                    /// When `isWhitePerspective` is false (Black's perspective), we reverse this lookup:
+                    /// row index 0 displays Rank 1 and row index 7 displays Rank 8.
+                    final actualRowIndex = isWhitePerspective ? rankIndex : 7 - rankIndex;
+                    final rank = 8 - actualRowIndex;
 
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(8, (fileIndex) {
-                        /// [Index values (inner loop)]
-                        /// `fileIndex` starts at `0` and runs to `7`. We map this to files using our list:
-                        /// index 0 -> file 'A' (left-most), index 7 -> file 'H' (right-most).
-                        final file = files[fileIndex];
+                        /// [Reversing column indexes]
+                        /// Under White's perspective, column index 0 is File A (left-most) and column index 7 is File H (right-most).
+                        /// When `isWhitePerspective` is false (Black's perspective), we reverse this lookup:
+                        /// column index 0 displays File H and column index 7 displays File A.
+                        final actualColIndex = isWhitePerspective ? fileIndex : 7 - fileIndex;
+                        final file = files[actualColIndex];
                         final label = '$file$rank';
 
                         // Alternating color logic:
@@ -158,17 +181,25 @@ class _LearningScreenState extends State<LearningScreen> {
 
                         /// [Accessing data using indexes]
                         /// To get the correct chess piece for the square, we read directly from our matrix list using
-                        /// indices. The first index `rankIndex` selects the row, and the second index `fileIndex` selects
+                        /// indices. The first index `actualRowIndex` selects the row, and the second index `actualColIndex` selects
                         /// the column within that row.
                         ///
                         /// [board[row][column]]
-                        /// Syntactically, `board[rankIndex][fileIndex]` queries the nested array. For example:
+                        /// Syntactically, `board[actualRowIndex][actualColIndex]` queries the nested array. For example:
                         /// `board[0][4]` evaluates to '♚' (Black King on E8), while `board[3][3]` evaluates to `""`.
+                        ///
+                        /// [Board orientation]
+                        /// Board orientation describes the direction from which the players view the grid.
+                        /// Reversing indices shifts the visual position of pieces 180 degrees.
+                        ///
+                        /// [Why board data remains unchanged]
+                        /// We never write values to, or change the structural layout of, the underlying `board` list state
+                        /// when flipping the board. Only the representation layout (the projected coordinates) changes.
                         return ChessSquare(
                           squareColor: squareColor,
                           label: label,
                           isSelected: selectedSquare == label,
-                          piece: board[rankIndex][fileIndex],
+                          piece: board[actualRowIndex][actualColIndex],
                           onTap: () {
                             // Clear any existing snack bars to prevent queueing delay
                             ScaffoldMessenger.of(context).clearSnackBars();
