@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/section_title.dart';
+import '../widgets/progress_card.dart';
 import 'learning_screen.dart';
 
 /// [Why widgets are separated]
@@ -51,6 +52,8 @@ class HomeScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              // We display the learning progress card here
+              const ProgressCard(),
               const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.all(16),

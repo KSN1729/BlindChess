@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/section_title.dart';
+import '../widgets/progress_card.dart';
 
 /// [Why widgets are separated]
 /// Keeping screens and layout components in separate files separates concerns and makes the codebase
@@ -50,6 +51,8 @@ class LearningScreen extends StatelessWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
+              // We display the learning progress card here
+              const ProgressCard(),
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
