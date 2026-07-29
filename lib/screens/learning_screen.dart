@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
+import '../widgets/section_title.dart';
 
-/// [StatelessWidget communication]
-/// Widgets in Flutter communicate primarily by passing parameters through their constructors.
-/// Since [StatelessWidget] objects are immutable (their properties cannot change over time),
-/// they receive initial data, configuration settings, or callback functions from parent widgets
-/// during creation. For navigation, passing arguments to the constructor of the next screen
-/// is the standard way to share information between screens.
+/// [Why widgets are separated]
+/// Keeping screens and layout components in separate files separates concerns and makes the codebase
+/// highly organized, clean, and scaling-friendly.
 ///
-/// In this case, [LearningScreen] is constructed cleanly as const since it currently does
-/// not require complex runtime data from [HomeScreen].
-
-/// [LearningScreen]
-/// A dedicated screen representing the learning environment in BlindChess.
-/// It displays instructions for upcoming chess memory exercises and a button to return home.
+/// [Widget reuse]
+/// Reusable widgets let us write logic and styling rules in a single place. The [SectionTitle] widget,
+/// for instance, ensures the font sizes, weights, and center alignments match perfectly on both screens
+/// without needing duplicate [TextStyle] markup.
+///
+/// [Constructor communication]
+/// We pass configurations (like the screen-specific title string) as constructor arguments to the child widget.
+/// The child receives this data via constructor parameters and displays it accordingly.
+///
+/// [StatelessWidget]
+/// A widget whose configuration values cannot change after creation. All variables declared within it
+/// must be marked as `final`.
 class LearningScreen extends StatelessWidget {
   const LearningScreen({super.key});
 
@@ -30,13 +34,9 @@ class LearningScreen extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: Text(
-                  'BlindChess Learning Mode',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                // Replaced static text widget with custom SectionTitle widget.
+                child: SectionTitle(
+                  title: 'BlindChess Learning Mode',
                 ),
               ),
               const Padding(
@@ -53,10 +53,6 @@ class LearningScreen extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  /// [Navigator.pop]
-                  /// Pops the top-most route (this current [LearningScreen]) off the Navigator's stack.
-                  /// This action slides the current screen away and reveals the previous screen
-                  /// underneath (the [HomeScreen]), which was waiting directly below it in the stack.
                   Navigator.pop(context);
                 },
                 child: const Text('Back Home'),

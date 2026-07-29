@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
+import '../widgets/section_title.dart';
 import 'learning_screen.dart';
 
-/// [Why separate files are useful]
-/// As projects grow, keeping all widgets in a single file like `main.dart` leads to massive,
-/// unmaintainable, and hard-to-read codebases. Dividing screens into dedicated files:
-/// 1. Encourages encapsulation and separation of concerns.
-/// 2. Makes it easier to locate, debug, and modify specific parts of the UI.
-/// 3. Facilitates collaboration, as developers can work on different screens without git merge conflicts.
-/// 4. Promotes code reuse and modular testing.
-
-/// [HomeScreen]
-/// The starting page of the BlindChess application, containing the main header,
-/// informational text, a visual chessboard layout icon, and a button to initiate learning mode.
+/// [Why widgets are separated]
+/// Separating widgets into different files decomposes large, monolith files into small, single-purpose
+/// components. This makes visual layouts modular, easier to maintain, and cleaner to read.
+///
+/// [Widget reuse]
+/// Reusable widgets are building blocks that can be declared once and referenced across different screens
+/// (like using [SectionTitle] in both [HomeScreen] and [LearningScreen]). This ensures design consistency
+/// and drastically reduces code duplication.
+///
+/// [Constructor communication]
+/// Parent widgets communicate with child widgets by passing arguments (like `title`) into their
+/// constructor when instantiating them.
+///
+/// [StatelessWidget]
+/// A widget that relies only on configuration properties passed through its constructor. It has no internal,
+/// mutable state that changes during its lifecycle.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -29,13 +35,9 @@ class HomeScreen extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
-                child: Text(
-                  'Welcome to BlindChess',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+                // Replaced the plain welcome Text widget with our custom reusable SectionTitle widget.
+                child: SectionTitle(
+                  title: 'Welcome to BlindChess',
                 ),
               ),
               const Padding(
@@ -65,14 +67,6 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 32),
               ElevatedButton(
                 onPressed: () {
-                  /// [Navigator]
-                  /// In Flutter, navigation is managed by the [Navigator] widget. The Navigator maintains
-                  /// a history of routes (screens) using a Stack data structure (LIFO - Last In, First Out).
-                  /// `Navigator.push()` is used to push a new route onto the stack, displaying the new screen.
-                  ///
-                  /// [MaterialPageRoute]
-                  /// A modal route that replaces the entire screen with a platform-adaptive transition animation
-                  /// (e.g., sliding up on iOS, fading/scaling up on Android).
                   Navigator.push(
                     context,
                     MaterialPageRoute(
