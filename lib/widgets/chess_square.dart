@@ -38,18 +38,26 @@ class ChessSquare extends StatelessWidget {
   // The selection state parameter passed to check if this square is chosen.
   final bool isSelected;
 
+  /// [Unicode characters]
+  /// Unicode is a universal character encoding standard that assigns a unique number to every character,
+  /// including symbols like emoji and chess pieces. This allows us to display rich chess symbols (e.g. ♜, ♔)
+  /// directly in our text widgets as string values, without needing heavy image assets.
+  final String piece;
+
   /// [Constructor parameters]
   /// The constructor allows parent widgets to pass configurations when instantiating this widget.
   /// - `this.squareColor` and `this.label` assign the passed values directly to our final fields.
   /// - `required` keyword guarantees that these parameters are provided at compilation time.
   /// - `this.onTap` is optional since a square might not always be interactive.
   /// - `this.isSelected` defaults to false.
+  /// - `this.piece` defaults to an empty string representing an empty square.
   const ChessSquare({
     super.key,
     required this.squareColor,
     required this.label,
     this.onTap,
     this.isSelected = false,
+    this.piece = '',
   });
 
   @override
@@ -85,23 +93,41 @@ class ChessSquare extends StatelessWidget {
                   width: 1.5,
                 ),
         ),
-        /// [Center]
-        /// A layout widget that aligns its child widget exactly in the middle of its parent's bounds.
-        ///
-        /// [Alignment]
-        /// Placing the Text inside a Center widget automatically sets the child's alignment to
-        /// Center vertically and horizontally, ensuring the coordinate label is perfectly positioned.
         child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-              // To ensure the coordinate label is legible, we change the font color dynamically:
-              // if the background color is white, we draw black text, otherwise we draw white text.
-              color: squareColor == Colors.white ? Colors.black : Colors.white,
-            ),
-          ),
+          // Conditional UI rendering: if no piece is on this square, show only the coordinate label.
+          // Otherwise, stack the piece character above the coordinate label vertically using a Column.
+          child: piece.isEmpty
+              ? Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: squareColor == Colors.white ? Colors.black : Colors.white,
+                  ),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      piece,
+                      style: TextStyle(
+                        fontSize: 26,
+                        height: 1.1, // Set tight line height to prevent vertical alignment offset
+                        color: squareColor == Colors.white ? Colors.black : Colors.white,
+                      ),
+                    ),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: squareColor == Colors.white
+                            ? Colors.black.withValues(alpha: 0.6)
+                            : Colors.white.withValues(alpha: 0.6),
+                      ),
+                    ),
+                  ],
+                ),
         ),
       ),
     );

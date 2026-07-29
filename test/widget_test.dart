@@ -41,6 +41,12 @@ void main() {
     expect(find.text('Complete 8×8 Chessboard'), findsOneWidget);
     expect(find.byType(ChessSquare), findsNWidgets(64));
 
+    // Verify starting pieces count and characters
+    expect(find.text('♔'), findsOneWidget); // White King
+    expect(find.text('♚'), findsOneWidget); // Black King
+    expect(find.text('♙'), findsNWidgets(8)); // 8 White Pawns
+    expect(find.text('♟'), findsNWidgets(8)); // 8 Black Pawns
+
     // Verify the four corners of the board are rendered correctly
     expect(find.text('A1'), findsOneWidget);
     expect(find.text('H1'), findsOneWidget);

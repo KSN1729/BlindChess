@@ -14,11 +14,6 @@ import '../widgets/chess_square.dart';
 /// [Constructor communication]
 /// We pass configurations (like the screen-specific title string) as constructor arguments to the child widget.
 /// The child receives this data via constructor parameters and displays it accordingly.
-
-/// [StatefulWidget]
-/// A widget that maintains mutable state. When state data changes, it notifies the framework to rebuild
-/// the widget and refresh the UI. Since the user can dynamically select a square, we converted
-/// [LearningScreen] from a StatelessWidget to a StatefulWidget to hold the selection value.
 class LearningScreen extends StatefulWidget {
   const LearningScreen({super.key});
 
@@ -34,6 +29,70 @@ class _LearningScreenState extends State<LearningScreen> {
   /// A mutable state variable that holds the coordinate label of the currently selected chess square (e.g., "E4").
   /// It is initialized to `null` to represent that no square is selected initially (which prints "None").
   String? selectedSquare;
+
+  /// [Helper methods]
+  /// A helper method is a function declared inside the state class to perform specific calculations
+  /// or lookups. Instead of cluttering our UI build tree with complex conditional logic,
+  /// we move that code into a helper function to keep the visual tree neat and maintainable.
+  ///
+  /// [Why logic is separated from UI]
+  /// Separating logic from visual code makes UI rendering clean and decoupled. The build method
+  /// only describes *what layout to draw*, while the helper method calculates *what data to put in it*.
+  ///
+  /// [Returning values]
+  /// Functions return values using the `return` keyword, passing calculated results back to the caller.
+  ///
+  /// [Why empty strings are useful]
+  /// We return an empty string `""` to represent empty chess squares. This acts as a standard sentinel
+  /// value that tells the ChessSquare widget to skip piece rendering and only draw coordinates.
+  String getPiece(int rankIndex, int fileIndex) {
+    // Ranks:
+    // rankIndex 0 represents Rank 8 (black back rank)
+    // rankIndex 1 represents Rank 7 (black pawn rank)
+    // rankIndex 2..5 represent empty squares (Ranks 6..3)
+    // rankIndex 6 represents Rank 2 (white pawn rank)
+    // rankIndex 7 represents Rank 1 (white back rank)
+    if (rankIndex == 0) {
+      // Black back rank pieces
+      switch (fileIndex) {
+        case 0:
+        case 7:
+          return '♜'; // Black Rook
+        case 1:
+        case 6:
+          return '♞'; // Black Knight
+        case 2:
+        case 5:
+          return '♝'; // Black Bishop
+        case 3:
+          return '♛'; // Black Queen
+        case 4:
+          return '♚'; // Black King
+      }
+    } else if (rankIndex == 1) {
+      return '♟'; // Black Pawn
+    } else if (rankIndex == 6) {
+      return '♙'; // White Pawn
+    } else if (rankIndex == 7) {
+      // White back rank pieces
+      switch (fileIndex) {
+        case 0:
+        case 7:
+          return '♖'; // White Rook
+        case 1:
+        case 6:
+          return '♘'; // White Knight
+        case 2:
+        case 5:
+          return '♗'; // White Bishop
+        case 3:
+          return '♕'; // White Queen
+        case 4:
+          return '♔'; // White King
+      }
+    }
+    return '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +201,7 @@ class _LearningScreenState extends State<LearningScreen> {
                           squareColor: squareColor,
                           label: label,
                           isSelected: selectedSquare == label,
+                          piece: getPiece(rankIndex, fileIndex),
                           onTap: () {
                             // Clear any existing snack bars to prevent queueing delay
                             ScaffoldMessenger.of(context).clearSnackBars();
