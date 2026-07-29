@@ -14,18 +14,29 @@ import '../widgets/chess_square.dart';
 /// [Constructor communication]
 /// We pass configurations (like the screen-specific title string) as constructor arguments to the child widget.
 /// The child receives this data via constructor parameters and displays it accordingly.
-///
-/// [StatelessWidget]
-/// A widget whose configuration values cannot change after creation. All variables declared within it
-/// must be marked as `final`.
-class LearningScreen extends StatelessWidget {
+
+/// [StatefulWidget]
+/// A widget that maintains mutable state. When state data changes, it notifies the framework to rebuild
+/// the widget and refresh the UI. Since the user can dynamically select a square, we converted
+/// [LearningScreen] from a StatelessWidget to a StatefulWidget to hold the selection value.
+class LearningScreen extends StatefulWidget {
   const LearningScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // List of files (columns) from A to H to map files to indices.
-    final files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+  State<LearningScreen> createState() => _LearningScreenState();
+}
 
+class _LearningScreenState extends State<LearningScreen> {
+  // List of files (columns) from A to H to map files to indices.
+  final files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+  /// [selectedSquare variable]
+  /// A mutable state variable that holds the coordinate label of the currently selected chess square (e.g., "E4").
+  /// It is initialized to `null` to represent that no square is selected initially (which prints "None").
+  String? selectedSquare;
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -119,13 +130,18 @@ class LearningScreen extends StatelessWidget {
                         final isDark = (rankIndex + fileIndex) % 2 != 0;
                         final squareColor = isDark ? Colors.brown : Colors.white;
 
-                        /// [Anonymous functions]
-                        /// Here, we pass an anonymous function `() { ... }` directly to the `onTap` parameter.
-                        /// This is a callback function that is not declared beforehand, acting as an event listener.
-                        /// When the ChessSquare is tapped, it invokes this function to display the SnackBar.
+                        /// [Boolean expressions]
+                        /// `selectedSquare == label` is a boolean expression evaluating to `true` or `false`.
+                        /// If the current square matches the selected coordinate, we pass `true` to `isSelected`.
+                        ///
+                        /// [Why only one square is highlighted]
+                        /// Since `selectedSquare` is a single variable, the comparison `selectedSquare == label`
+                        /// can evaluate to `true` for at most one square at any given time. All other 63 squares
+                        /// evaluate to `false` and render with standard black borders.
                         return ChessSquare(
                           squareColor: squareColor,
                           label: label,
+                          isSelected: selectedSquare == label,
                           onTap: () {
                             // Clear any existing snack bars to prevent queueing delay
                             ScaffoldMessenger.of(context).clearSnackBars();
@@ -137,11 +153,43 @@ class LearningScreen extends StatelessWidget {
                                 duration: const Duration(seconds: 1),
                               ),
                             );
+
+                            /// [setState()]
+                            /// Tapping a square updates the `selectedSquare` variable.
+                            /// Wrapping this state change in `setState()` tells the Flutter framework to mark
+                            /// this widget as "dirty" and schedule a rebuild, running the build method again
+                            /// to reflect the new selection on screen.
+                            setState(() {
+                              selectedSquare = label;
+                            });
                           },
                         );
                       }),
                     );
                   }),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Title displaying which square is currently selected
+                const Text(
+                  'Selected Square:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                
+                /// [Conditional UI]
+                /// We use conditional rendering (`selectedSquare ?? 'None'`) to decide what text to show.
+                /// If the variable is `null`, it renders `'None'`. If it has a value, it renders the coordinate.
+                Text(
+                  selectedSquare ?? 'None',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red,
+                  ),
                 ),
 
                 const SizedBox(height: 16),

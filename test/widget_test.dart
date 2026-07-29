@@ -47,12 +47,34 @@ void main() {
     expect(find.text('A8'), findsOneWidget);
     expect(find.text('H8'), findsOneWidget);
 
-    // Test tapping a chess square triggers the callback and shows a SnackBar
-    final d4Square = find.text('D4');
-    await tester.ensureVisible(d4Square);
-    await tester.tap(d4Square);
-    await tester.pump(); // Start SnackBar animation
-    expect(find.text('You tapped D4'), findsOneWidget);
+    // Verify that the initial selection text is "None"
+    expect(find.text('Selected Square:'), findsOneWidget);
+    expect(find.text('None'), findsOneWidget);
+
+    // Test tapping a chess square (E4) triggers the callback, shows a SnackBar, and updates selection
+    final e4Square = find.widgetWithText(ChessSquare, 'E4');
+    await tester.ensureVisible(e4Square);
+    await tester.tap(e4Square);
+    await tester.pumpAndSettle(); // Settle state updates and SnackBar animation
+
+    // Verify SnackBar message appears
+    expect(find.text('You tapped E4'), findsOneWidget);
+
+    // Dismiss SnackBars to avoid overlaying other interactive buttons
+    ScaffoldMessenger.of(tester.element(find.byType(LearningScreen))).clearSnackBars();
+    await tester.pumpAndSettle();
+
+    // Verify Selected Square updates to E4
+    expect(find.text('E4'), findsNWidgets(2)); // The square label and the Selected Square display text
+    expect(find.text('None'), findsNothing);
+
+    // Assert that the ChessSquare widget has isSelected set to true
+    final e4ChessSquare = tester.widget<ChessSquare>(e4Square);
+    expect(e4ChessSquare.isSelected, isTrue);
+
+    // Assert that another ChessSquare (e.g. A1) is not selected
+    final a1ChessSquare = tester.widget<ChessSquare>(find.widgetWithText(ChessSquare, 'A1'));
+    expect(a1ChessSquare.isSelected, isFalse);
 
     // Verify a separate ProgressCard is drawn on LearningScreen starting at 0.
     expect(find.text('Completed Lessons: 0'), findsOneWidget);

@@ -35,16 +35,21 @@ class ChessSquare extends StatelessWidget {
   /// executing it when triggered.
   final VoidCallback? onTap;
 
+  // The selection state parameter passed to check if this square is chosen.
+  final bool isSelected;
+
   /// [Constructor parameters]
   /// The constructor allows parent widgets to pass configurations when instantiating this widget.
   /// - `this.squareColor` and `this.label` assign the passed values directly to our final fields.
   /// - `required` keyword guarantees that these parameters are provided at compilation time.
   /// - `this.onTap` is optional since a square might not always be interactive.
+  /// - `this.isSelected` defaults to false.
   const ChessSquare({
     super.key,
     required this.squareColor,
     required this.label,
     this.onTap,
+    this.isSelected = false,
   });
 
   @override
@@ -69,10 +74,16 @@ class ChessSquare extends StatelessWidget {
         height: 60,
         decoration: BoxDecoration(
           color: squareColor,
-          border: Border.all(
-            color: Colors.black,
-            width: 1.5, // 1.5 pixels wide border to outline the chess square clearly
-          ),
+          // Apply a thicker red border when selected, or standard black border when not.
+          border: isSelected
+              ? Border.all(
+                  color: Colors.red,
+                  width: 3.0,
+                )
+              : Border.all(
+                  color: Colors.black,
+                  width: 1.5,
+                ),
         ),
         /// [Center]
         /// A layout widget that aligns its child widget exactly in the middle of its parent's bounds.
