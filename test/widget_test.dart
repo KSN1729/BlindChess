@@ -1,33 +1,46 @@
-// This is a basic Flutter widget test for the BlindChess application.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package.
+// This is a basic Flutter widget test for screen separation and navigation.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:chess/main.dart';
+import 'package:chess/screens/home_screen.dart';
+import 'package:chess/screens/learning_screen.dart';
 
 void main() {
-  testWidgets('BlindChess home screen UI elements and SnackBar test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
+  testWidgets('BlindChess screen navigation transition test', (WidgetTester tester) async {
+    // 1. Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
 
-    // Verify that the welcome and description texts are displayed.
+    // 2. Verify that we start on the HomeScreen.
+    expect(find.byType(HomeScreen), findsOneWidget);
     expect(find.text('Welcome to BlindChess'), findsOneWidget);
-    expect(find.text('Train your chess memory with Blindfold Mode'), findsOneWidget);
-
-    // Verify that the chess grid icon is present.
-    expect(find.byIcon(Icons.grid_on), findsOneWidget);
-
-    // Verify that the button "Start Learning" is displayed.
     expect(find.text('Start Learning'), findsOneWidget);
 
-    // Tap the 'Start Learning' button and trigger a frame.
-    await tester.tap(find.text('Start Learning'));
-    await tester.pump(); // Starts the SnackBar appearance animation
+    // Verify LearningScreen is not yet in the tree.
+    expect(find.byType(LearningScreen), findsNothing);
 
-    // Verify that the SnackBar is displayed with the correct message.
-    expect(find.text('BlindChess journey begins!'), findsOneWidget);
+    // 3. Tap the 'Start Learning' button to navigate.
+    await tester.tap(find.text('Start Learning'));
+    
+    // Pump and settle triggers and waits for all transitions/routing animations to complete.
+    await tester.pumpAndSettle();
+
+    // 4. Verify we are now on the LearningScreen.
+    expect(find.byType(LearningScreen), findsOneWidget);
+    expect(find.text('BlindChess Learning Mode'), findsOneWidget);
+    expect(find.text('Future memory training exercises will appear here.'), findsOneWidget);
+    expect(find.text('Back Home'), findsOneWidget);
+
+    // Verify HomeScreen is no longer the top screen active.
+    expect(find.text('Welcome to BlindChess'), findsNothing);
+
+    // 5. Tap the 'Back Home' button to pop back.
+    await tester.tap(find.text('Back Home'));
+    await tester.pumpAndSettle();
+
+    // 6. Verify we are returned to the HomeScreen.
+    expect(find.byType(HomeScreen), findsOneWidget);
+    expect(find.text('Welcome to BlindChess'), findsOneWidget);
+    expect(find.byType(LearningScreen), findsNothing);
   });
 }
