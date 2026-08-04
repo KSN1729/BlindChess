@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight captures c3",
+  "boardId": "board_51",
+  "style": "conversational",
+  "category": "captures",
+  "duration": 1.71825,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c864f2528ec6760e9d44fe9e26ad51ab5e670a0ef959c7f24681c5d48c6b53ad"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "square f6",
+  "boardId": "board_20",
+  "style": "formal",
+  "category": "coordinates",
+  "duration": 0.9751875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "bee7b33367d203c0ba08d437ab97a6b47c34ac7bc9078858fab0082c8bfa48d2"
+}

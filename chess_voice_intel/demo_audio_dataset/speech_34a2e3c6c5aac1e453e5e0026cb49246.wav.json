@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "bishop from c4 to b5",
+  "boardId": "board_41",
+  "style": "formal",
+  "category": "legal_moves",
+  "duration": 1.8575625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "3fcb13b89bd869702d7ed88548024d72c6bfeb5fc578fdf2fc820f342a9b83d5"
+}

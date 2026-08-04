@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "captures on e5",
+  "boardId": "board_58",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.311875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "23aaeb9a4a65d1579c4306f4e2a57d68bd336ce3e585b1d5832f524d43ffa2cd"
+}

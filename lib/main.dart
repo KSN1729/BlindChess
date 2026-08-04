@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'services/settings_service.dart';
+import 'services/lichess_service.dart';
 
-void main() {
+void main() async {
+  // Ensure framework services are initialized before accessing local storage
+  WidgetsFlutterBinding.ensureInitialized();
+  await SettingsService.instance.loadSettings();
+  await LichessService.instance.init();
   runApp(const MyApp());
 }
 
@@ -13,14 +19,53 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BlindChess Learning',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
+    // Listen to changes in the isDarkMode state to dynamically switch themes
+    return ValueListenableBuilder<bool>(
+      valueListenable: SettingsService.instance.isDarkModeNotifier,
+      builder: (context, isDarkMode, child) {
+        return MaterialApp(
+          title: 'BlindChess',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+          ),
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          home: const HomeScreen(),
+          onGenerateRoute: (settings) {
+            final name = settings.name ?? '';
+            if (name.startsWith('/?') || name.contains('code=')) {
+              try {
+                final uri = Uri.parse(
+                  name.startsWith('/')
+                      ? 'org.blindchess.app://oauth-callback$name'
+                      : name,
+                );
+                LichessService.instance.handleIncomingUri(uri);
+              } catch (e) {
+                debugPrint('Failed to parse incoming deep link route: $e');
+              }
+              return MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              );
+            }
+            return null;
+          },
+          onUnknownRoute: (settings) {
+            return MaterialPageRoute(builder: (context) => const HomeScreen());
+          },
+        );
+      },
     );
   }
 }

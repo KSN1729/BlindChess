@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "queen to f7 delivering checkmate",
+  "boardId": "board_70",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 2.0085,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "a078affa7b6011b1cabd0a7e05053e3fd64059366bf0888784e725798247237b"
+}

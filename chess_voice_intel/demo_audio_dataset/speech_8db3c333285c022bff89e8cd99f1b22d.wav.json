@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight to f7 delivering checkmate",
+  "boardId": "board_73",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 1.9620625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "b2760353472cbe9fb784c85151045df26a6c7ad7c976065483f8236dcbbb7e2d"
+}

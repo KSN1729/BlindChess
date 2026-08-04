@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen captures h7",
+  "boardId": "board_53",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.6601875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "bb5595e095b5af2c40d9e872d4d7434fc283e8237ffb863c1061f565af5814c6"
+}

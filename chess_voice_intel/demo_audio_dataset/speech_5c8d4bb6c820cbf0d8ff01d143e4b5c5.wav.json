@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight takes pawn on e4",
+  "boardId": "board_45",
+  "style": "conversational",
+  "category": "captures",
+  "duration": 1.9620625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "014fafce2e0584a916bd512e71300e6b48c2d3f88ece570ad06bb0f6922e9df0"
+}

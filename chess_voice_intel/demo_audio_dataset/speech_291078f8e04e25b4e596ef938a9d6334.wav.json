@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "king captures g2",
+  "boardId": "board_56",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.5905625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c917db51a57f0991673576d036b81a721b348717743b626e19279965395c36f8"
+}

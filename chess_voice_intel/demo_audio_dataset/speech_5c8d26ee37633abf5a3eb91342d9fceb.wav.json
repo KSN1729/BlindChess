@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight from b1 to c3",
+  "boardId": "board_33",
+  "style": "conversational",
+  "category": "legal_moves",
+  "duration": 1.787875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "50cf29f015a60feb78b897694fbd3e1c3694c985978d01a6fbc6db9d6a7203c1"
+}

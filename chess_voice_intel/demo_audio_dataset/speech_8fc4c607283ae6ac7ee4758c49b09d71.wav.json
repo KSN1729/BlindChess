@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "pawn to h8 promoting to knight",
+  "boardId": "board_97",
+  "style": "formal",
+  "category": "promotions",
+  "duration": 1.8808125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c08d46c60f50f2586dca16cbb06abe7950989f3ab00042b6ab1b01f13a65c7c6"
+}

@@ -1,0 +1,12 @@
+{
+  "canonicalMove": "d1h5",
+  "spokenText": "queen takes pawn on f7",
+  "boardId": "board_default",
+  "style": "formal",
+  "category": "move",
+  "duration": 1.7995,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "8f78c7462c2fbd81ae280a1dbd47f6c8e54b3b842ca00c8c97f09c95327ff560",
+  "audioPath": "C:\\FlutterProjects\\BlindChess\\chess_voice_intel\\cached_speech\\speech_9df1d84257b51bdb609e5b9f869098ce.wav"
+}

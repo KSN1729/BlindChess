@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../models/chess_piece.dart';
+import '../utils/chess_svgs.dart';
+import '../services/settings_service.dart';
 
 /// [StatelessWidget]
 /// A StatelessWidget is a widget that does not maintain dynamic internal state. Once built,
@@ -11,6 +15,12 @@ import 'package:flutter/material.dart';
 /// reusable [ChessSquare] widget. Reusable widgets promote DRY (Don't Repeat Yourself) design,
 /// make it extremely easy to tweak visual borders or layouts in one place, and ensure consistent
 /// behavior across our application.
+///
+/// [Reusable code]
+/// Reusable code isolates specific behaviors and layouts so they can be instantiated anywhere.
+/// By passing parameters like `pieceName` and `isWhitePiece` into ChessSquare, we keep this widget
+/// completely flexible—it can display any piece type, color, and coordinate without hardcoding
+/// internal mapping logics.
 class ChessSquare extends StatelessWidget {
   /// [final variables]
   /// In Dart, fields of a StatelessWidget must be declared as `final`.
@@ -38,11 +48,29 @@ class ChessSquare extends StatelessWidget {
   // The selection state parameter passed to check if this square is chosen.
   final bool isSelected;
 
-  /// [Unicode characters]
-  /// Unicode is a universal character encoding standard that assigns a unique number to every character,
-  /// including symbols like emoji and chess pieces. This allows us to display rich chess symbols (e.g. ♜, ♔)
-  /// directly in our text widgets as string values, without needing heavy image assets.
-  final String piece;
+  /// [Null safety]
+  /// Dart is a null-safe language. Null safety prevents bugs caused by trying to access fields or methods
+  /// on a `null` variable (which raises a Null Pointer Exception).
+  ///
+  /// By declaring `ChessPiece? piece` (with a question mark `?`), we inform Dart that this parameter is nullable—it
+  /// can hold a concrete `ChessPiece` object, or it can hold `null` representing an empty square. Dart requires
+  /// us to check if the value is null before using it.
+  final ChessPiece? piece;
+
+  // The English name of the piece (e.g. 'King', 'Queen', etc.) or 'Empty'.
+  final String pieceName;
+
+  // True if the piece is white, false otherwise.
+  final bool isWhitePiece;
+
+  // True if the king on this square is currently in check.
+  final bool isCheck;
+
+  // True if the piece symbol should be hidden under Blindfold Mode rules.
+  final bool isPieceHidden;
+
+  // Visual guess evaluation state ('green' for correct, 'red' for incorrect, or null).
+  final String? flashState;
 
   /// [Constructor parameters]
   /// The constructor allows parent widgets to pass configurations when instantiating this widget.
@@ -50,84 +78,146 @@ class ChessSquare extends StatelessWidget {
   /// - `required` keyword guarantees that these parameters are provided at compilation time.
   /// - `this.onTap` is optional since a square might not always be interactive.
   /// - `this.isSelected` defaults to false.
-  /// - `this.piece` defaults to an empty string representing an empty square.
+  /// - `this.piece` is optional and can be null for empty squares.
+  /// - `this.pieceName` defaults to 'Empty'.
+  /// - `this.isWhitePiece` defaults to false.
   const ChessSquare({
     super.key,
     required this.squareColor,
     required this.label,
     this.onTap,
     this.isSelected = false,
-    this.piece = '',
+    this.piece,
+    this.pieceName = 'Empty',
+    this.isWhitePiece = false,
+    this.isCheck = false,
+    this.isPieceHidden = false,
+    this.flashState,
   });
 
   @override
   Widget build(BuildContext context) {
-    /// [GestureDetector or InkWell]
-    /// Both capture tap events, but:
-    /// - [GestureDetector]: A non-visual gesture wrapper that detects raw taps, double-taps, drags,
-    ///   and scales without adding any visual effects.
-    /// - [InkWell]: A Material Design widget that captures taps and shows a visual splash/ripple animation.
+    /// [Tooltip widget]
+    /// A built-in Material design widget that displays a floating text description when a user long-presses
+    /// (on mobile devices) or hovers (on desktop web browsers) the wrapped widget. Tooltips significantly
+    /// improve visual accessibility by explaining what obscure graphical symbols represent.
     ///
-    /// Here, we wrap the square in a [GestureDetector] to capture clicks, executing the callback
-    /// when the tap gesture is detected.
-    return GestureDetector(
-      /// [Anonymous functions]
-      /// Inside `onTap`, we pass a short inline anonymous function `() => onTap?.call()` to check
-      /// if a callback was provided and execute it.
-      onTap: () {
-        onTap?.call();
-      },
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: squareColor,
-          // Apply a thicker red border when selected, or standard black border when not.
-          border: isSelected
-              ? Border.all(
-                  color: Colors.red,
-                  width: 3.0,
-                )
-              : Border.all(
-                  color: Colors.black,
-                  width: 1.5,
-                ),
-        ),
-        child: Center(
-          // Conditional UI rendering: if no piece is on this square, show only the coordinate label.
-          // Otherwise, stack the piece character above the coordinate label vertically using a Column.
-          child: piece.isEmpty
-              ? Text(
-                  label,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: squareColor == Colors.white ? Colors.black : Colors.white,
+    /// If Blindfold Mode is active and hiding pieces, we obfuscate the tooltip message to prevent cheating.
+    return Tooltip(
+      message: isPieceHidden
+          ? 'Square $label'
+          : (pieceName == 'Empty'
+                ? 'Empty Square'
+                : '${isWhitePiece ? 'White' : 'Black'} $pieceName'),
+      child: GestureDetector(
+        /// [Anonymous functions]
+        /// Inside `onTap`, we pass a short inline anonymous function `() => onTap?.call()` to check
+        /// if a callback was provided and execute it.
+        onTap: () {
+          onTap?.call();
+        },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final squareSize = constraints.maxWidth;
+            final pieceSize =
+                squareSize * 0.55; // 55% of square size for the piece SVG
+            final fontSize =
+                squareSize *
+                0.25; // 25% of square size for coordinates when empty
+            final labelFontSize =
+                squareSize * 0.18; // 18% for small rank/file labels
+
+            return Container(
+              decoration: BoxDecoration(
+                color: squareColor,
+                // Apply a thicker red border when selected, or standard black border when not.
+                border: isSelected
+                    ? Border.all(color: Colors.red, width: 3.0)
+                    : Border.all(color: Colors.black, width: 1.5),
+                // Apply a glowing red shadow around the checked king's square
+                boxShadow: isCheck
+                    ? [
+                        const BoxShadow(
+                          color: Colors.redAccent,
+                          blurRadius: 12.0,
+                          spreadRadius: 3.0,
+                        ),
+                      ]
+                    : null,
+              ),
+              child: Stack(
+                children: [
+                  Center(
+                    // Conditional UI rendering: if no piece is on this square, show only the coordinate label.
+                    // Otherwise, stack the piece SVG graphic above the coordinate label vertically.
+                    child: piece == null
+                        ? Text(
+                            label,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: fontSize,
+                              color: squareColor == Colors.white
+                                  ? Colors.black
+                                  : Colors.white,
+                            ),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              AnimatedOpacity(
+                                opacity: isPieceHidden ? 0.0 : 1.0,
+                                duration: const Duration(milliseconds: 250),
+                                child: SizedBox(
+                                  width: pieceSize,
+                                  height: pieceSize,
+                                  child: SvgPicture.string(
+                                    getPieceSvg(
+                                      piece!.pieceType,
+                                      piece!.pieceColor,
+                                      SettingsService.instance.boardTheme,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: squareSize * 0.02),
+                              Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: labelFontSize,
+                                  fontWeight: FontWeight.bold,
+                                  color: squareColor == Colors.white
+                                      ? Colors.black.withValues(alpha: 0.6)
+                                      : Colors.white.withValues(alpha: 0.6),
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
-                )
-              : Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      piece,
-                      style: TextStyle(
-                        fontSize: 26,
-                        height: 1.1, // Set tight line height to prevent vertical alignment offset
-                        color: squareColor == Colors.white ? Colors.black : Colors.white,
+                  // Correct/Incorrect feedback overlay
+                  if (flashState != null)
+                    Positioned.fill(
+                      child: Container(
+                        color: flashState == 'green'
+                            ? Colors.green.withValues(alpha: 0.4)
+                            : Colors.red.withValues(alpha: 0.4),
+                        child: Center(
+                          child: Text(
+                            flashState == 'green' ? '✓' : '✗',
+                            style: TextStyle(
+                              fontSize: squareSize * 0.5,
+                              fontWeight: FontWeight.bold,
+                              color: flashState == 'green'
+                                  ? Colors.greenAccent
+                                  : Colors.redAccent,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    Text(
-                      label,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: squareColor == Colors.white
-                            ? Colors.black.withValues(alpha: 0.6)
-                            : Colors.white.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

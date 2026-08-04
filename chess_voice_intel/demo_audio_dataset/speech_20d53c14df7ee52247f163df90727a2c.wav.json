@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen to f8 mate",
+  "boardId": "board_79",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 1.2770625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "ca411dc821f1cf3db1ce3fd028c361db9767c12086792ed480f7e6af0da0d9b8"
+}

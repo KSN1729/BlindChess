@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "play bishop to b5",
+  "boardId": "board_14",
+  "style": "formal",
+  "category": "piece_names",
+  "duration": 1.4628125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "ac085b5fec432f4e449b05e5d07fcbdecc4e3de04d39709d3cab7f95e1b5d3be"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen to e7 giving check",
+  "boardId": "board_65",
+  "style": "formal",
+  "category": "checks",
+  "duration": 1.6718125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "23d452240cffaff310ab87b374c961649ae0ec6e9ac6988719d691ad74c3d5e2"
+}

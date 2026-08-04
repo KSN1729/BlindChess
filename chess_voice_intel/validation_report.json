@@ -1,0 +1,85 @@
+{
+  "total_generated": 100000,
+  "accepted": 99998,
+  "rejected": 2,
+  "rejection_reasons": {
+    "No castling moves found in SAN moves list": 2
+  },
+  "duplicate_rate_pct": 58.68817376347527,
+  "unique_fens": 41311,
+  "average_piece_count": 21.41897837956759,
+  "average_branching_factor": 24.68179363587272,
+  "average_generation_latency_ms": 8.549102621999918,
+  "category_rejections": {
+    "opening": {},
+    "middlegame": {},
+    "endgame": {},
+    "promotion": {},
+    "castling": {
+      "No castling moves found in SAN moves list": 2
+    },
+    "en_passant": {},
+    "check": {},
+    "checkmate_in_one": {},
+    "ambiguous_rook": {},
+    "ambiguous_bishop": {},
+    "ambiguous_knight": {}
+  },
+  "category_metrics": {
+    "opening": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "middlegame": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "endgame": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "promotion": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "castling": {
+      "generated": 9091,
+      "accepted": 9089,
+      "success_rate_pct": 99.9780002199978
+    },
+    "en_passant": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "check": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "checkmate_in_one": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "ambiguous_rook": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "ambiguous_bishop": {
+      "generated": 9091,
+      "accepted": 9091,
+      "success_rate_pct": 100.0
+    },
+    "ambiguous_knight": {
+      "generated": 9090,
+      "accepted": 9090,
+      "success_rate_pct": 100.0
+    }
+  }
+}

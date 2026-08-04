@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook to h8 mate",
+  "boardId": "board_77",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 1.3003125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "59bac396b48d913590412063702b8d181c1446ca767c960120a9f914db1b24c7"
+}

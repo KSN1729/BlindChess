@@ -1,0 +1,12 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight to f3",
+  "boardId": "board_default",
+  "style": "formal",
+  "category": "move",
+  "duration": 1.0796875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "0e8fadaba87a2317b707ed146ea25bd50abbef4f106b49a6043092c0d1ad3a92",
+  "audioPath": "C:\\FlutterProjects\\BlindChess\\chess_voice_intel\\cached_speech\\speech_e16563cea7efb13f879cdc3d8bd0ebaf.wav"
+}

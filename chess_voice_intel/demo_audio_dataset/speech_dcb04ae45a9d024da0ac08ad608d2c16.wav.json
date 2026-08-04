@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn to f8 promoting to queen",
+  "boardId": "board_94",
+  "style": "formal",
+  "category": "promotions",
+  "duration": 2.124625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "d021e3b21cd7a12d8c90a9cecc45ae3004aea06df03f691b13c6354a4da8d692"
+}

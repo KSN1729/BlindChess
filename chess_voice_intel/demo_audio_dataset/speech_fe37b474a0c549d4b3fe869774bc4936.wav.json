@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "promote pawn to queen on e8",
+  "boardId": "board_98",
+  "style": "formal",
+  "category": "promotions",
+  "duration": 1.892375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "eec2b503dd366be3f84c1efd916a0ad78f6eedb506bb0ab0e63d3be7169188fc"
+}

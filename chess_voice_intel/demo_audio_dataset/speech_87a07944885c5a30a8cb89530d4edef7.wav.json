@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn captures e5",
+  "boardId": "board_54",
+  "style": "conversational",
+  "category": "captures",
+  "duration": 1.497625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "e22b0dcf3d911833c61275ecd773fb19245cdf74932a7fcb5bd190dd5a934c4a"
+}

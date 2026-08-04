@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "king from e1 to e2",
+  "boardId": "board_37",
+  "style": "formal",
+  "category": "legal_moves",
+  "duration": 1.544125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "34e24c0d567128accf77f9f8c209a1ccdd4321f040f33232b1feb63ed06966c3"
+}

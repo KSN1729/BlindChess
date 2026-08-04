@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "castle queenside",
+  "boardId": "board_81",
+  "style": "conversational",
+  "category": "castling",
+  "duration": 1.253875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "1f81dd2dcc405d258c7b536950f0d1b1bf45e1f7b3d9fcc054c17f33315b8ad5"
+}

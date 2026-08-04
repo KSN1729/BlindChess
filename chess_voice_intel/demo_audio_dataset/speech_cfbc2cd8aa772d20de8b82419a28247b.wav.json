@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "queen to h5 giving check",
+  "boardId": "board_60",
+  "style": "conversational",
+  "category": "checks",
+  "duration": 1.787875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "85057daa71ef9cba3641776e3f585d45e520b4601cbdec9d5625e84371942ced"
+}

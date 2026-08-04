@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "knight to f6 giving check",
+  "boardId": "board_62",
+  "style": "formal",
+  "category": "checks",
+  "duration": 1.706625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "0e82a9d540859e97047b8ad8814d0a26ead91a506972f6b911c4ee2ba31842bb"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight to c3",
+  "boardId": "board_3",
+  "style": "conversational",
+  "category": "piece_names",
+  "duration": 1.1725625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "36d920c3c3c2f91f8fed2da53e20eecad43c6a6661e6bc6ab479ab1eeb3d952b"
+}

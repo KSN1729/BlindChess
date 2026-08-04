@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "knight to f7 mate",
+  "boardId": "board_78",
+  "style": "conversational",
+  "category": "checkmates",
+  "duration": 1.2654375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "8a1cef361fca0cc51a0defc676d8c74997af779d54ffa2cb662c15ded9db91b5"
+}

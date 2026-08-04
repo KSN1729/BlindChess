@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "pawn to b8 promote to knight",
+  "boardId": "board_93",
+  "style": "conversational",
+  "category": "promotions",
+  "duration": 1.625375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "8b2c42816457e31e08ab20d1516a6198a72a400563fa1ee4df3a25c730ea1702"
+}

@@ -1,0 +1,81 @@
+{
+  "boards_processed": 4078,
+  "total_moves_audited": 100012,
+  "total_samples_generated": 4917343,
+  "total_rejected": 0,
+  "average_phrases_per_move": 49.16752989641243,
+  "overall_vocabulary_entropy_bits": 5.223260610254565,
+  "overall_lexical_diversity": 5.8496084536277005e-06,
+  "overall_unique_phrases": 90244,
+  "overall_duplicate_rate_percent": 98.1647812650043,
+  "style_diversity": {
+    "formal": {
+      "total_phrases": 522465,
+      "unique_phrases": 10906,
+      "duplicate_rate_percent": 97.91258744604902,
+      "vocabulary_entropy_bits": 5.085160295900006,
+      "lexical_diversity": 5.143204405831311e-05,
+      "avg_phrase_length_words": 4.242421980419741
+    },
+    "conversational": {
+      "total_phrases": 975174,
+      "unique_phrases": 14061,
+      "duplicate_rate_percent": 98.55810347691796,
+      "vocabulary_entropy_bits": 4.657343000069426,
+      "lexical_diversity": 1.995863488349908e-05,
+      "avg_phrase_length_words": 6.062741623546157
+    },
+    "minimal": {
+      "total_phrases": 529466,
+      "unique_phrases": 8829,
+      "duplicate_rate_percent": 98.3324708290995,
+      "vocabulary_entropy_bits": 5.443722268906417,
+      "lexical_diversity": 9.24867871672149e-05,
+      "avg_phrase_length_words": 3.104029342771774
+    },
+    "natural": {
+      "total_phrases": 2384191,
+      "unique_phrases": 29332,
+      "duplicate_rate_percent": 98.769729438623,
+      "vocabulary_entropy_bits": 4.993182562713177,
+      "lexical_diversity": 7.106149365104722e-06,
+      "avg_phrase_length_words": 7.495978719825719
+    },
+    "verbose": {
+      "total_phrases": 506047,
+      "unique_phrases": 27116,
+      "duplicate_rate_percent": 94.64160443595159,
+      "vocabulary_entropy_bits": 4.883662100088508,
+      "lexical_diversity": 2.817286678423822e-05,
+      "avg_phrase_length_words": 8.206613219720698
+    }
+  },
+  "category_distribution": {
+    "opening": 440800,
+    "capture": 319927,
+    "middlegame": 438500,
+    "endgame": 152450,
+    "check": 173758,
+    "promotion": 447007,
+    "castling": 557351,
+    "en_passant": 529100,
+    "checkmate_in_one": 517450,
+    "ambiguous_rook": 535900,
+    "ambiguous_bishop": 407000,
+    "ambiguous_knight": 398100
+  },
+  "nlp_robustness_recovery_rate": 1.0,
+  "performance": {
+    "total_audit_time_seconds": 344.3633927999763,
+    "average_latency_per_board_ms": 26.44287182394755,
+    "min_latency_ms": 0.8776999893598258,
+    "max_latency_ms": 150.1947999931872,
+    "throughput_moves_per_second": 290.4257597964022,
+    "throughput_samples_per_second": 14279.5172274779
+  },
+  "memory": {
+    "start_mb": 24.078125,
+    "end_mb": 460.5625,
+    "delta_mb": 436.484375
+  }
+}

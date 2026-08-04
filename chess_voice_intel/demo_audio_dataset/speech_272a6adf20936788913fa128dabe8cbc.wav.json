@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "that move is not allowed",
+  "boardId": "board_106",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 1.544125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "9c5e1af8658d3741c418001576d10a86842fea72b8b2a742719d09cced5cee11"
+}

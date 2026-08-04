@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "castling is not legal",
+  "boardId": "board_109",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 1.5556875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "6af70bf419e6bd3576981932096bf150497b005cd1fd36159296dff70f940608"
+}

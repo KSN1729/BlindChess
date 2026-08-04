@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook from h1 to e1",
+  "boardId": "board_39",
+  "style": "conversational",
+  "category": "legal_moves",
+  "duration": 1.7646875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "612dae6ed0ac962215de8d45cccbf615edb6050ae37b0be2095af6f3cd53e6b2"
+}

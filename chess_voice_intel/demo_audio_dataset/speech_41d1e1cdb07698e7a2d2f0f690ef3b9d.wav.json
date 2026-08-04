@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "move e2 to e4",
+  "boardId": "board_30",
+  "style": "conversational",
+  "category": "legal_moves",
+  "duration": 1.5789375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "2eca554fd944f7f4b2422a1f43f9ec85a3de9f3041555946d98a99df6b7fb60f"
+}

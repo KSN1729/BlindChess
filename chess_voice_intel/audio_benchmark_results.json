@@ -1,0 +1,24 @@
+{
+  "boards_processed": 100,
+  "total_time_seconds": 13.988587700005155,
+  "throughput_samples_per_second": 7.148684495144792,
+  "latency_stats": {
+    "avg_ms": 139.88434800237883,
+    "min_ms": 86.26910002203658,
+    "max_ms": 2342.5350000034086,
+    "p95_ms": 164.10930000711232
+  },
+  "cpu": {
+    "before_percent": 20.9,
+    "after_percent": 81.7
+  },
+  "memory": {
+    "before_mb": 52.6640625,
+    "after_mb": 211.88671875,
+    "delta_mb": 159.22265625
+  },
+  "disk": {
+    "total_bytes": 4423386,
+    "total_kb": 4319.712890625
+  }
+}

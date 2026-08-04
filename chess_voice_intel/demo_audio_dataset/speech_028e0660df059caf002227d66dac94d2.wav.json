@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "pawn to d8 promote to rook",
+  "boardId": "board_91",
+  "style": "formal",
+  "category": "promotions",
+  "duration": 1.7646875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "21d9b463b540928bed93e7164202952e08fffab17267fb371f4e1a369eea9dd8"
+}

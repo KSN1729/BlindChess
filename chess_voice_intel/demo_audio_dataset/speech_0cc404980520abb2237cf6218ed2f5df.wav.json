@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn to a8 promoting to bishop",
+  "boardId": "board_96",
+  "style": "conversational",
+  "category": "promotions",
+  "duration": 1.9620625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "07f1c766e758a5bdf174e048daf57a4384f4466cf9a480a82a0466bb9e21ba5a"
+}

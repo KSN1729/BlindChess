@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn from a2 to a3",
+  "boardId": "board_44",
+  "style": "formal",
+  "category": "legal_moves",
+  "duration": 1.637,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "03e653409db19068219c4a5384cbd5de8ec70babf77eb96e79b52499f6f755d3"
+}

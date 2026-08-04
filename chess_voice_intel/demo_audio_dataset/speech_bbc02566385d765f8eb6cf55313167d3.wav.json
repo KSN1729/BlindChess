@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "king takes queen on f2",
+  "boardId": "board_50",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.729875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c72889e19a92fd70422efd43ed2f61caa86cfd837b7043ec617f1cf27f2c2c85"
+}

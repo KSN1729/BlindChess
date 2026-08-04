@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "king to e2",
+  "boardId": "board_10",
+  "style": "formal",
+  "category": "piece_names",
+  "duration": 1.021625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "1cdc823c45c2bf236ceeee08e96b208d67759d20f6a0f573fe353c4311782678"
+}

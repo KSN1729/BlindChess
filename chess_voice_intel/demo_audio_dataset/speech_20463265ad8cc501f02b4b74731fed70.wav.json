@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen to d2",
+  "boardId": "board_9",
+  "style": "conversational",
+  "category": "piece_names",
+  "duration": 1.0796875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "b50640f4d412e243cf991a96c84bced8a53da5f3152f9921f81d0e885d6cc9b3"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn cannot move there",
+  "boardId": "board_102",
+  "style": "conversational",
+  "category": "invalid_moves",
+  "duration": 1.335125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "bcb7ed96d7a0ec115079c4ac647a341aff0c3fd151347f9b0e762835edb11a7f"
+}

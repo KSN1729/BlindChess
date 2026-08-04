@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "move castle queenside",
+  "boardId": "board_89",
+  "style": "formal",
+  "category": "castling",
+  "duration": 1.6834375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "3c02da0962a7a22af0dfbbb937c9503915ab1d4a9a94342edf3d32d34fe0179b"
+}

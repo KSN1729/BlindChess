@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "bishop takes knight on c6",
+  "boardId": "board_46",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.98525,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "8cb57fe733fd359da5efc927af184fbaad8e435224312ab896d3742cfc8465a8"
+}

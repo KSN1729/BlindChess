@@ -1,0 +1,107 @@
+{
+  "square_target_entropy": 5.795053493524055,
+  "piece_type_entropy": 2.1894110322455087,
+  "total_generated_samples": 10000,
+  "piece_percentages": {
+    "pawns": 47.55180310166999,
+    "knights": 11.73784744847616,
+    "bishops": 12.448569247668162,
+    "rooks": 13.116470872973023,
+    "queens": 5.837506748831754,
+    "kings": 9.307802580380914
+  },
+  "category_diversity": {
+    "opening": {
+      "total_generated": 909,
+      "unique": 901,
+      "duplicate_rate_pct": 0.88008800880088
+    },
+    "middlegame": {
+      "total_generated": 909,
+      "unique": 909,
+      "duplicate_rate_pct": 0.0
+    },
+    "endgame": {
+      "total_generated": 909,
+      "unique": 611,
+      "duplicate_rate_pct": 32.78327832783278
+    },
+    "promotion": {
+      "total_generated": 909,
+      "unique": 40,
+      "duplicate_rate_pct": 95.59955995599559
+    },
+    "castling": {
+      "total_generated": 909,
+      "unique": 363,
+      "duplicate_rate_pct": 60.066006600660074
+    },
+    "en_passant": {
+      "total_generated": 909,
+      "unique": 188,
+      "duplicate_rate_pct": 79.31793179317933
+    },
+    "check": {
+      "total_generated": 909,
+      "unique": 894,
+      "duplicate_rate_pct": 1.65016501650165
+    },
+    "checkmate_in_one": {
+      "total_generated": 909,
+      "unique": 79,
+      "duplicate_rate_pct": 91.30913091309131
+    },
+    "ambiguous_rook": {
+      "total_generated": 909,
+      "unique": 392,
+      "duplicate_rate_pct": 56.875687568756874
+    },
+    "ambiguous_bishop": {
+      "total_generated": 909,
+      "unique": 1,
+      "duplicate_rate_pct": 99.8899889988999
+    },
+    "ambiguous_knight": {
+      "total_generated": 909,
+      "unique": 600,
+      "duplicate_rate_pct": 33.993399339933994
+    }
+  },
+  "fen_pools_summary": {
+    "PROMOTION_FENS": {
+      "total": 3,
+      "unique": 3,
+      "malformed": 0
+    },
+    "EN_PASSANT_FENS": {
+      "total": 2,
+      "unique": 2,
+      "malformed": 0
+    },
+    "CHECKMATE_FENS": {
+      "total": 4,
+      "unique": 4,
+      "malformed": 0
+    },
+    "ROOK_FENS": {
+      "total": 3,
+      "unique": 3,
+      "malformed": 0
+    },
+    "BISHOP_FENS": {
+      "total": 3,
+      "unique": 3,
+      "malformed": 0
+    },
+    "KNIGHT_FENS": {
+      "total": 3,
+      "unique": 3,
+      "malformed": 0
+    },
+    "ENDGAME_FENS": {
+      "total": 6,
+      "unique": 6,
+      "malformed": 0
+    }
+  }
+}

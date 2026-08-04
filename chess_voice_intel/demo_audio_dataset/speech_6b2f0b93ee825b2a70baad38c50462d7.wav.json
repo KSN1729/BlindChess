@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "knight from f3 to d4",
+  "boardId": "board_40",
+  "style": "formal",
+  "category": "legal_moves",
+  "duration": 1.7530625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "4745d1531270301ebb01a81143123e962db7323ab14c00955893d58c151d7c17"
+}

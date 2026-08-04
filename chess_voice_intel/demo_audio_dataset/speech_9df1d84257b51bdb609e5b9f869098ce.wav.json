@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen takes pawn on f7",
+  "boardId": "board_47",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.7530625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "0ae156914c201bd43984b84ffccb9c7df3668024cf840cd62388fd57bba1aca0"
+}

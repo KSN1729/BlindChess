@@ -1,0 +1,12 @@
+{
+  "canonicalMove": "e1g1",
+  "spokenText": "castle kingside",
+  "boardId": "board_default",
+  "style": "formal",
+  "category": "move",
+  "duration": 1.1958125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "ff68cb0582a2083d18f0002549ec3c9313e16f4182ecfd8f2cba00369dd3d8b8",
+  "audioPath": "C:\\FlutterProjects\\BlindChess\\chess_voice_intel\\cached_speech\\speech_9eb48a16dff1909d5be54346d91d3ce0.wav"
+}

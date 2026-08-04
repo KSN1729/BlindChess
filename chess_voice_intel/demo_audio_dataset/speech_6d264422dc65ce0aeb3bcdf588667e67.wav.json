@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "bishop to f7 delivering checkmate",
+  "boardId": "board_72",
+  "style": "conversational",
+  "category": "checkmates",
+  "duration": 2.3335625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "361a0721d47b51f44b075be4ace566d28416f204a5979c7ca9919e05334fa725"
+}

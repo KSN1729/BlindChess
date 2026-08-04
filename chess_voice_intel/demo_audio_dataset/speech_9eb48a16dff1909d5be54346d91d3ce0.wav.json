@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "castle kingside",
+  "boardId": "board_80",
+  "style": "formal",
+  "category": "castling",
+  "duration": 1.230625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "1b6a76c372f353e0d797a21135302a1e9164847387485bf0137d07c8f6df47a2"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "rook to d8 check",
+  "boardId": "board_68",
+  "style": "formal",
+  "category": "checks",
+  "duration": 1.416375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "ae712c9cef0c6572eac74df88dbbfa2258e1cb038534b548d1296ae86309d3f1"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "queen to g7 mate",
+  "boardId": "board_76",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 1.3003125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "b0014f56b3ef52b7b8b08aa026662222ec7db657b4f5de04c76ccc2c3e9cd7bd"
+}

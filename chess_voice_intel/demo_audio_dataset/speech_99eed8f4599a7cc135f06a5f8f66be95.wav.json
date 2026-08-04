@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "a1d1",
+  "spokenText": "rook from a to d1",
+  "boardId": "b18",
+  "style": "formal",
+  "category": "ambiguous_rook",
+  "duration": 1.428,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "761eab57db75a2fbfeb43e64606b5f9d57767ffb3d93eb4edb1ecfda9030fda7"
+}

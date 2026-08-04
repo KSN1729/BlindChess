@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn to c8 promote to bishop",
+  "boardId": "board_92",
+  "style": "formal",
+  "category": "promotions",
+  "duration": 1.9388125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "5ed0727c51933668d87eea80c3641ed5904dc5bfd37c3e045fd5b186f8c71de5"
+}

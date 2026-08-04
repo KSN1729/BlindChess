@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "bishop captures f7",
+  "boardId": "board_52",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.787875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c6d4d3d36328044007124eaba9530d8f45bd4d2feaa06f36eef40947cb5c5446"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "king is in check",
+  "boardId": "board_104",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 0.963625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "2dc670f1ac4a94a847a042966241918b8dcdaa00190e2c5dae433c65d826565c"
+}

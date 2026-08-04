@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "takes on d4",
+  "boardId": "board_57",
+  "style": "conversational",
+  "category": "captures",
+  "duration": 1.1029375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "77e2c7e985e1a5c13ec1bb6ca2f51d0ceb313bf66f5f984e0b996bb8e6ff1b8b"
+}

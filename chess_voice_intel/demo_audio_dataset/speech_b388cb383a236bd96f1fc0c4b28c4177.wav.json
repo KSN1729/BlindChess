@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "bishop to c4 giving check",
+  "boardId": "board_66",
+  "style": "conversational",
+  "category": "checks",
+  "duration": 1.834375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "668a46797d325b1b8cbd701a6fddfcbc8f0d2aba05d3e07f90183e305d389da4"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "castle long",
+  "boardId": "board_83",
+  "style": "formal",
+  "category": "castling",
+  "duration": 0.7778125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "61f07d126d0109da541f210bb7bdc0656ff326be39e5121ec5c294590c48af6f"
+}

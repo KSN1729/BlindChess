@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "the pawn moves to e3",
+  "boardId": "board_12",
+  "style": "conversational",
+  "category": "piece_names",
+  "duration": 1.61375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "cf268c9b9c9a8df163234a7643bc765e746fa5c14c500a8ac62dcfbf4f9bd872"
+}

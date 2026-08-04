@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "move d2 to d4",
+  "boardId": "board_31",
+  "style": "formal",
+  "category": "legal_moves",
+  "duration": 1.5556875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c42f4c7f7b196627761e42042f607aac636029382150bb9cedeaa7f77d92663b"
+}

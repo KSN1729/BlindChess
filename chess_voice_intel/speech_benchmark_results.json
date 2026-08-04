@@ -1,0 +1,11 @@
+{
+  "average_latency_ms": 58.808615999878384,
+  "min_latency_ms": 1.4412000309675932,
+  "max_latency_ms": 260.4692000313662,
+  "memory_usage_before_mb": 22.6953125,
+  "memory_usage_after_mb": 25.29296875,
+  "memory_delta_mb": 2.59765625,
+  "avg_samples_per_board": 1226.65,
+  "avg_paraphrases_per_move": 49.16432865731463,
+  "is_deterministic": true
+}

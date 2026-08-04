@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook to h8 delivering checkmate",
+  "boardId": "board_71",
+  "style": "formal",
+  "category": "checkmates",
+  "duration": 1.9504375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "5aedaecd5125515054f545fd4706132d55f39963c94b82fabd71679cb6bbaca0"
+}

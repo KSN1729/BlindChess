@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "no legal moves available",
+  "boardId": "board_105",
+  "style": "conversational",
+  "category": "invalid_moves",
+  "duration": 1.520875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "301ea7177c640eeaafd8fc25e99491ff36ddad98b55adb3a1d7ebdea99081448"
+}

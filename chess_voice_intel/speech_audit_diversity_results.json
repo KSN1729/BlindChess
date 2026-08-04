@@ -1,0 +1,69 @@
+{
+  "boards_processed": 4039,
+  "total_moves_audited": 100036,
+  "total_samples_generated": 4942415,
+  "average_phrases_per_move": 49.406363709064735,
+  "overall_lexical_diversity": 5.943375398041927e-06,
+  "overall_vocabulary_entropy_bits": 5.223413738724803,
+  "style_diversity": {
+    "formal": {
+      "total_phrases": 530560,
+      "unique_phrases": 11105,
+      "duplicate_rate_percent": 97.90692852834741,
+      "vocabulary_entropy_bits": 5.08342757805449,
+      "lexical_diversity": 4.88805258663853e-05,
+      "avg_phrase_length_words": 4.280087077804584
+    },
+    "conversational": {
+      "total_phrases": 979017,
+      "unique_phrases": 14152,
+      "duplicate_rate_percent": 98.5544684106609,
+      "vocabulary_entropy_bits": 4.655788963713465,
+      "lexical_diversity": 1.9868745049651657e-05,
+      "avg_phrase_length_words": 6.066264426460419
+    },
+    "minimal": {
+      "total_phrases": 531608,
+      "unique_phrases": 8841,
+      "duplicate_rate_percent": 98.33693247656169,
+      "vocabulary_entropy_bits": 5.443131661009749,
+      "lexical_diversity": 9.45096554335479e-05,
+      "avg_phrase_length_words": 3.104966441438052
+    },
+    "natural": {
+      "total_phrases": 2391695,
+      "unique_phrases": 29532,
+      "duplicate_rate_percent": 98.7652271715248,
+      "vocabulary_entropy_bits": 4.991713039646407,
+      "lexical_diversity": 7.085902903044204e-06,
+      "avg_phrase_length_words": 7.493810874714376
+    },
+    "verbose": {
+      "total_phrases": 509535,
+      "unique_phrases": 27449,
+      "duplicate_rate_percent": 94.61293139823565,
+      "vocabulary_entropy_bits": 4.882888111544732,
+      "lexical_diversity": 2.7956909084131657e-05,
+      "avg_phrase_length_words": 8.213394565633372
+    }
+  },
+  "category_distribution": {
+    "opening": 436900,
+    "capture": 339740,
+    "middlegame": 440400,
+    "endgame": 161000,
+    "promotion": 451894,
+    "check": 170200,
+    "castling": 554331,
+    "en_passant": 527650,
+    "checkmate_in_one": 525450,
+    "ambiguous_rook": 525050,
+    "ambiguous_bishop": 403700,
+    "ambiguous_knight": 406100
+  },
+  "nlp_robustness_recovery_rate": 1.0,
+  "performance": {
+    "total_audit_time_seconds": 156.6712472999934,
+    "throughput_samples_per_second": 31546.40743069011
+  }
+}

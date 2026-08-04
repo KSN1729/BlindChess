@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "knight cannot jump there",
+  "boardId": "board_103",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 1.3583125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "163182ea6edc68d1453aaebd785149635e14c62f43e82667cc414275a5a3af68"
+}

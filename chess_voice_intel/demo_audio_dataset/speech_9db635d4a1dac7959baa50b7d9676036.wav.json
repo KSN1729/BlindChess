@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "invalid coordinates",
+  "boardId": "board_107",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 1.4511875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "3869f4305f2b1373a468ee36e9172863867202f2922001dd1dc9b4f37776fb99"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "destination d7",
+  "boardId": "board_27",
+  "style": "conversational",
+  "category": "coordinates",
+  "duration": 1.439625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "3e5cc79f5ddd7514d0e757c856bf668fefc1e33e02b4e270198f4c049f353d57"
+}

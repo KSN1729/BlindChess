@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook to e8 giving check",
+  "boardId": "board_63",
+  "style": "conversational",
+  "category": "checks",
+  "duration": 1.6834375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "2977be1a059187ab3e9c266f8afe19bd8ec0f2cf7aeff1f5f699e5f11db8a0e6"
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "square is empty",
+  "boardId": "board_101",
+  "style": "formal",
+  "category": "invalid_moves",
+  "duration": 0.940375,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "d4e5e079acdcb1f7004099a3a482c2a75eb6e3d8b21a0d1b90be725f42b90d78"
+}

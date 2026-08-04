@@ -25,10 +25,7 @@ class SectionTitle extends StatelessWidget {
   ///   helping Flutter efficiently track and update widgets in the element tree.
   /// - `required this.title` is a named parameter specifying that the caller must supply
   ///   the title string when instantiating this widget.
-  const SectionTitle({
-    super.key,
-    required this.title,
-  });
+  const SectionTitle({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +33,7 @@ class SectionTitle extends StatelessWidget {
     // It returns a standard Text widget configured with our styling rules.
     return Text(
       title,
-      style: const TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.bold,
-      ),
+      style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
     );
   }

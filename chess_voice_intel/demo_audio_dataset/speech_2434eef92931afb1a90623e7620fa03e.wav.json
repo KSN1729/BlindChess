@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn to e4",
+  "boardId": "board_0",
+  "style": "conversational",
+  "category": "piece_names",
+  "duration": 0.963625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "0349adf82c0fc73e55f231185e82823ec2ef3482e6cbb3dab3b31621b414e694"
+}

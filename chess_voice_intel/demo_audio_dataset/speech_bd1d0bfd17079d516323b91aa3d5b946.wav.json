@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "piece cannot move there",
+  "boardId": "board_108",
+  "style": "conversational",
+  "category": "invalid_moves",
+  "duration": 1.40475,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "485340f4ae87f4b8586db4b1c74a4258f451275dc90708e6ad059a26c14d8ba1"
+}

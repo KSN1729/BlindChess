@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "queen to a4 check",
+  "boardId": "board_69",
+  "style": "conversational",
+  "category": "checks",
+  "duration": 1.2770625,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "bd62ce1c18cd1dd46cd3abc67c00de9784e57af846549f2272091da045841efb"
+}

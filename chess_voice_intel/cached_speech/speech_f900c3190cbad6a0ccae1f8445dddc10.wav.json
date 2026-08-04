@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "pawn to e8 promote to queen",
+  "boardId": "board_default",
+  "style": "formal",
+  "category": "move",
+  "duration": 1.8808125,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "c60edc443910437a1c30b11c085c0774571c112f09c6b57a2d203d80a5a6ab86"
+}

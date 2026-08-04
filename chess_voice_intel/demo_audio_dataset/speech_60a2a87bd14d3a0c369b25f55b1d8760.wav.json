@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook captures d1",
+  "boardId": "board_55",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.3235,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "d67ff67929a72afb8e0b4dfda0266dd4fa07828506c7eb9d8dd89948c01027b5"
+}

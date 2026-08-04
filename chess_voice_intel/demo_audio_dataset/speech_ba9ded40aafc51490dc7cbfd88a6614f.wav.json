@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "rook takes rook on d8",
+  "boardId": "board_49",
+  "style": "formal",
+  "category": "captures",
+  "duration": 1.637,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "a9f83839e4b5ba486e9098ca7c0f3b36ce784ae2787deb215e4206300f17e326"
+}

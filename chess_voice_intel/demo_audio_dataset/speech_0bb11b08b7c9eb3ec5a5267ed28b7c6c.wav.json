@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "e2e4",
+  "spokenText": "bishop to c4",
+  "boardId": "board_4",
+  "style": "formal",
+  "category": "piece_names",
+  "duration": 1.253875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "0b9210fa4270f2198f5331cf188bd9faa3a205fcf921b86c7be38fb3f7c66803"
+}

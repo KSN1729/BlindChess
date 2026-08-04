@@ -1,0 +1,26 @@
+{
+  "boards_processed": 4053,
+  "total_moves_processed": 100008,
+  "total_samples_generated": 4940948,
+  "total_rejected": 0,
+  "rejection_reasons": {},
+  "unique_phrases": 92011,
+  "duplicate_phrases": 4848937,
+  "duplicate_rate_percent": 98.1377865138431,
+  "avg_phrases_per_move": 49.405527557795374,
+  "validation_success_rate_percent": 100.0,
+  "latency_stats": {
+    "avg_ms": 42.31577458664306,
+    "min_ms": 0.9351000189781189,
+    "max_ms": 323.61799996579066
+  },
+  "throughput": {
+    "moves_per_second": 202.79624271462148,
+    "samples_per_second": 10019.255358054592
+  },
+  "memory": {
+    "start_mb": 23.8515625,
+    "end_mb": 36.31640625,
+    "delta_mb": 12.46484375
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "canonicalMove": "g1f3",
+  "spokenText": "move the knight to d2",
+  "boardId": "board_13",
+  "style": "formal",
+  "category": "piece_names",
+  "duration": 1.4511875,
+  "sampleRate": 16000,
+  "speakerId": "en_US-lessac-medium",
+  "checksum": "9ae77e74e2210c747ec6e6830870dccc7acfc2dcb42a4e39808f0cd4ef40ac31"
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ChessVoiceExample",
+  "type": "object",
+  "properties": {
+    "rawSpeech": {
+      "type": "string",
+      "description": "The raw verbal input spoken by the user before any STT correction."
+    },
+    "stt": {
+      "type": "string",
+      "description": "The speech-to-text transcription output including mistakes/phonetic noise."
+    },
+    "normalized": {
+      "type": "string",
+      "description": "The text normalized to clean lowercased words."
+    },
+    "fen": {
+      "type": "string",
+      "description": "The FEN representation of the current board state."
+    },
+    "legalMoves": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of all legal moves (SAN notation) in the current board state."
+    },
+    "correctMove": {
+      "type": "string",
+      "description": "The correct target move in SAN notation."
+    },
+    "piece": {
+      "type": "string",
+      "enum": ["p", "n", "b", "r", "q", "k", ""],
+      "description": "Lowercase symbol of the moving piece (p, n, b, r, q, k, or empty for castling)."
+    },
+    "destination": {
+      "type": "string",
+      "description": "The target square (e.g. e1)."
+    },
+    "originFile": {
+      "type": "string",
+      "enum": ["a", "b", "c", "d", "e", "f", "g", "h", ""],
+      "description": "The starting file constraint (a-h or empty)."
+    },
+    "originRank": {
+      "type": "string",
+      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", ""],
+      "description": "The starting rank constraint (1-8 or empty)."
+    },
+    "capture": {
+      "type": "boolean",
+      "description": "Whether the move is a capture."
+    },
+    "promotion": {
+      "type": "string",
+      "enum": ["q", "r", "b", "n", ""],
+      "description": "The promotion piece symbol (q, r, b, n or empty)."
+    },
+    "castle": {
+      "type": "string",
+      "enum": ["k", "q", ""],
+      "description": "Type of castling: k (kingside), q (queenside), or empty."
+    },
+    "reason": {
+      "type": "string",
+      "description": "Natural language rationale detailing why this is the correct move under board legality context."
+    }
+  },
+  "required": [
+    "rawSpeech",
+    "stt",
+    "normalized",
+    "fen",
+    "legalMoves",
+    "correctMove",
+    "piece",
+    "destination",
+    "originFile",
+    "originRank",
+    "capture",
+    "promotion",
+    "castle",
+    "reason"
+  ]
+}

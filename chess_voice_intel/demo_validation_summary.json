@@ -1,0 +1,882 @@
+[
+  {
+    "phrase": "pawn to e4",
+    "filename": "speech_2434eef92931afb1a90623e7620fa03e.wav",
+    "category": "piece_names",
+    "duration": 0.963625,
+    "checksum": "0349adf82c0fc73e55f231185e82823ec2ef3482e6cbb3dab3b31621b414e694",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to d4",
+    "filename": "speech_63671f0146ce4e4e491ebc3bf3805d4b.wav",
+    "category": "piece_names",
+    "duration": 0.940375,
+    "checksum": "f4a3da015d95070d193af9588d9ff485bce4facfa5c18586619957f69a12ec6d",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to f3",
+    "filename": "speech_e16563cea7efb13f879cdc3d8bd0ebaf.wav",
+    "category": "piece_names",
+    "duration": 1.230625,
+    "checksum": "a75ac6a889a64fef2eba2c741f7cc8e262ecaf417f8652a990e9c8d8d153ae2c",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to c3",
+    "filename": "speech_6ecbc6d20251b1f202bd4f74bff2c3d2.wav",
+    "category": "piece_names",
+    "duration": 1.1725625,
+    "checksum": "36d920c3c3c2f91f8fed2da53e20eecad43c6a6661e6bc6ab479ab1eeb3d952b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop to c4",
+    "filename": "speech_0bb11b08b7c9eb3ec5a5267ed28b7c6c.wav",
+    "category": "piece_names",
+    "duration": 1.253875,
+    "checksum": "0b9210fa4270f2198f5331cf188bd9faa3a205fcf921b86c7be38fb3f7c66803",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop to f4",
+    "filename": "speech_4f91228204d04805f912b16415ce4803.wav",
+    "category": "piece_names",
+    "duration": 1.3003125,
+    "checksum": "b5ad49ee118e9d4c944a6508991a827826afa6c69a2fba1fd71370772b3328e9",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to d1",
+    "filename": "speech_20dd69c36dec4ad7384e393be38c733a.wav",
+    "category": "piece_names",
+    "duration": 0.9868125,
+    "checksum": "4212d179e5f90363d630b90f0a971b9ac7cbed53a08e7e021d22fb5dcd69653c",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to e1",
+    "filename": "speech_8640321cf1dafe46db1a72b166256ec8.wav",
+    "category": "piece_names",
+    "duration": 0.952,
+    "checksum": "ceffab25a478a0c28034f180fea30eb579d72190f7e0d4098b168eff2c8d81ae",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to h5",
+    "filename": "speech_63e5831a30339a5117df87f83a77ae0f.wav",
+    "category": "piece_names",
+    "duration": 1.1958125,
+    "checksum": "a427b9b53098382b2595ca37557cc97468de0e12f117a3215bc1c6fad43702c6",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to d2",
+    "filename": "speech_20463265ad8cc501f02b4b74731fed70.wav",
+    "category": "piece_names",
+    "duration": 1.0796875,
+    "checksum": "b50640f4d412e243cf991a96c84bced8a53da5f3152f9921f81d0e885d6cc9b3",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king to e2",
+    "filename": "speech_e5d7fceb46b23a78c7c44f7176d6599c.wav",
+    "category": "piece_names",
+    "duration": 1.021625,
+    "checksum": "1cdc823c45c2bf236ceeee08e96b208d67759d20f6a0f573fe353c4311782678",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king to f1",
+    "filename": "speech_3fbdb75b2f0a3b6b7f8a5b3b0fa57782.wav",
+    "category": "piece_names",
+    "duration": 1.0565,
+    "checksum": "a36c93da2b9893dfb254ab2db05d192db64f1375c9b39e6478c2d07b678ae8f0",
+    "status": "VALID"
+  },
+  {
+    "phrase": "the pawn moves to e3",
+    "filename": "speech_59e2d517b3b990fe415cef0d57657f42.wav",
+    "category": "piece_names",
+    "duration": 1.61375,
+    "checksum": "cf268c9b9c9a8df163234a7643bc765e746fa5c14c500a8ac62dcfbf4f9bd872",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move the knight to d2",
+    "filename": "speech_3b9a96cdfa6b1849f704f5d5c1fcf5fb.wav",
+    "category": "piece_names",
+    "duration": 1.4511875,
+    "checksum": "9ae77e74e2210c747ec6e6830870dccc7acfc2dcb42a4e39808f0cd4ef40ac31",
+    "status": "VALID"
+  },
+  {
+    "phrase": "play bishop to b5",
+    "filename": "speech_c0f966cdcc6f8b5ef647eb105d078fd5.wav",
+    "category": "piece_names",
+    "duration": 1.4628125,
+    "checksum": "ac085b5fec432f4e449b05e5d07fcbdecc4e3de04d39709d3cab7f95e1b5d3be",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square a1",
+    "filename": "speech_c5c461293df6284c85f3aa896ef6462f.wav",
+    "category": "coordinates",
+    "duration": 0.859125,
+    "checksum": "4a759ada3e3987c843eea9a7bb907b27011c4bf625d835731c5641ed6aece845",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square b2",
+    "filename": "speech_f957cbf85d0149b450d505bf00d9727d.wav",
+    "category": "coordinates",
+    "duration": 0.9868125,
+    "checksum": "fc0df3cd3ef2b6c9d0919096981cd644b00d71250e07eadbf671feda3de33ec0",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square c3",
+    "filename": "speech_4c8590fad177cf0889a49a808b1b1323.wav",
+    "category": "coordinates",
+    "duration": 1.13775,
+    "checksum": "02ff33bcaad97f803e731ee6ecf6af041dc22050b771be21e4b12eeadfdfd170",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square d4",
+    "filename": "speech_d89e2433d5ddba2f5a5bd84eca3c16e7.wav",
+    "category": "coordinates",
+    "duration": 1.0913125,
+    "checksum": "8a64eda1313303f760d334893ba5edc7d0de3e841ae3de0a71c7006ecc71e454",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square e5",
+    "filename": "speech_90edfa72c8a81043569cc067421d2ff4.wav",
+    "category": "coordinates",
+    "duration": 1.021625,
+    "checksum": "34654406fd276757c9ef8c4472ec70bcb57b816f09206d98d5f5a6fb3e9e50ba",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square f6",
+    "filename": "speech_7bbafd78a78aec9aebf0bf2dbf205268.wav",
+    "category": "coordinates",
+    "duration": 0.9751875,
+    "checksum": "bee7b33367d203c0ba08d437ab97a6b47c34ac7bc9078858fab0082c8bfa48d2",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square g7",
+    "filename": "speech_02f8ebdbd55a89b384e3c838f40eb3b2.wav",
+    "category": "coordinates",
+    "duration": 1.13775,
+    "checksum": "d39b82117ab7e7e4fc585007519748a18f102ef93b11178feee8a183ed94c8be",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square h8",
+    "filename": "speech_9a7663dae8e2bc77e1151be7bf79735d.wav",
+    "category": "coordinates",
+    "duration": 0.8939375,
+    "checksum": "ca76b64c3acf0ee5b2c2f876d6c7e1813f52b8ed6136300f5edaafff40e9f57d",
+    "status": "VALID"
+  },
+  {
+    "phrase": "coordinate a8",
+    "filename": "speech_995aea8898f78e2c8875646378fc62f5.wav",
+    "category": "coordinates",
+    "duration": 1.0913125,
+    "checksum": "3e1e4d4f91f5d25f0823e78de2e9700de690073937277e9d565cb950f2fda82a",
+    "status": "VALID"
+  },
+  {
+    "phrase": "coordinate h1",
+    "filename": "speech_cae55b56e09afd4fe33d4c2069c8b6d3.wav",
+    "category": "coordinates",
+    "duration": 1.2654375,
+    "checksum": "cfaacdff8b701ce64fc2e0b2006edd7da2dbb109ad680274f0cd4ad6abbb32eb",
+    "status": "VALID"
+  },
+  {
+    "phrase": "target square c6",
+    "filename": "speech_fbed5f20b5d7dcac40846e16e246039f.wav",
+    "category": "coordinates",
+    "duration": 1.5789375,
+    "checksum": "32bc4b579900027f1df383eb12d9e4f1b2120370d445fc893be88f19fd91baf1",
+    "status": "VALID"
+  },
+  {
+    "phrase": "destination f3",
+    "filename": "speech_20af1d9d4b7d54c118ae3c6119207179.wav",
+    "category": "coordinates",
+    "duration": 1.3699375,
+    "checksum": "4f326a8b1405116aa4f2c132d88685f509d08ffccd47b7803da160d316db5018",
+    "status": "VALID"
+  },
+  {
+    "phrase": "destination d7",
+    "filename": "speech_f9e5497a902443eb5a31d2b10f717984.wav",
+    "category": "coordinates",
+    "duration": 1.439625,
+    "checksum": "3e5cc79f5ddd7514d0e757c856bf668fefc1e33e02b4e270198f4c049f353d57",
+    "status": "VALID"
+  },
+  {
+    "phrase": "destination e2",
+    "filename": "speech_2539c9276f898feff0d5a508297c5995.wav",
+    "category": "coordinates",
+    "duration": 1.335125,
+    "checksum": "d436983324dffbf2364ff918a6b5996f37bf0c3e498ae644fc8888bf9152a46c",
+    "status": "VALID"
+  },
+  {
+    "phrase": "destination g5",
+    "filename": "speech_7c09b5e7df845a3eb3cd1c6a034f685e.wav",
+    "category": "coordinates",
+    "duration": 1.4628125,
+    "checksum": "8735f8e381c583ff4286c3ffc4c7f5521b401d15375480199f43eac506364cf3",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move e2 to e4",
+    "filename": "speech_41d1e1cdb07698e7a2d2f0f690ef3b9d.wav",
+    "category": "legal_moves",
+    "duration": 1.5789375,
+    "checksum": "2eca554fd944f7f4b2422a1f43f9ec85a3de9f3041555946d98a99df6b7fb60f",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move d2 to d4",
+    "filename": "speech_ae9e68faab2f0d5fd1ff0f1465b237f1.wav",
+    "category": "legal_moves",
+    "duration": 1.5556875,
+    "checksum": "c42f4c7f7b196627761e42042f607aac636029382150bb9cedeaa7f77d92663b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight from g1 to f3",
+    "filename": "speech_be9fea68d8e9b0d7ac08d4a596c165cf.wav",
+    "category": "legal_moves",
+    "duration": 1.8808125,
+    "checksum": "20e323a179f56ee0c1abbf7dcd45478443e37e0229bc1a5f230384786ce2d155",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight from b1 to c3",
+    "filename": "speech_5c8d26ee37633abf5a3eb91342d9fceb.wav",
+    "category": "legal_moves",
+    "duration": 1.787875,
+    "checksum": "50cf29f015a60feb78b897694fbd3e1c3694c985978d01a6fbc6db9d6a7203c1",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop from f1 to c4",
+    "filename": "speech_174dff4602ddc9f27fa1c1d383c27702.wav",
+    "category": "legal_moves",
+    "duration": 1.8808125,
+    "checksum": "28e778475a6be7c78365e69aaa160cddbe26a307186206dd603c0228020bda51",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook from a1 to d1",
+    "filename": "speech_dee694cc78412df3b66f6702c8835db5.wav",
+    "category": "legal_moves",
+    "duration": 1.4860625,
+    "checksum": "8eeab664df2c72166417918eab534a49fea735cab818bd33d6dacde4055b0a4b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen from d1 to h5",
+    "filename": "speech_42c2f90ad9cea343a29c8fe4648b40cc.wav",
+    "category": "legal_moves",
+    "duration": 1.92725,
+    "checksum": "5fa031841b42242b16088e510d5da14804a111ebc9c4a6827b492a0d51867c67",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king from e1 to e2",
+    "filename": "speech_f51391a28b674e8226a2a2f99a0077f2.wav",
+    "category": "legal_moves",
+    "duration": 1.544125,
+    "checksum": "34e24c0d567128accf77f9f8c209a1ccdd4321f040f33232b1feb63ed06966c3",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn from c2 to c4",
+    "filename": "speech_2ac06c0401a07af2b5e5f149c5fcf4c5.wav",
+    "category": "legal_moves",
+    "duration": 1.602125,
+    "checksum": "1779e0d218277e0879a7381f55bd1436341745b9b1b44f7a3a19fa53313d667a",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook from h1 to e1",
+    "filename": "speech_406cf6e011b0a58eda8c01eb953c77ee.wav",
+    "category": "legal_moves",
+    "duration": 1.7646875,
+    "checksum": "612dae6ed0ac962215de8d45cccbf615edb6050ae37b0be2095af6f3cd53e6b2",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight from f3 to d4",
+    "filename": "speech_6b2f0b93ee825b2a70baad38c50462d7.wav",
+    "category": "legal_moves",
+    "duration": 1.7530625,
+    "checksum": "4745d1531270301ebb01a81143123e962db7323ab14c00955893d58c151d7c17",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop from c4 to b5",
+    "filename": "speech_34a2e3c6c5aac1e453e5e0026cb49246.wav",
+    "category": "legal_moves",
+    "duration": 1.8575625,
+    "checksum": "3fcb13b89bd869702d7ed88548024d72c6bfeb5fc578fdf2fc820f342a9b83d5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen from h5 to f7",
+    "filename": "speech_c6b7a8875df961163e0ee97479f18c02.wav",
+    "category": "legal_moves",
+    "duration": 1.8575625,
+    "checksum": "3f02d1d7c3856b9399d610b07635287ca4b03e7ed628fcd064d7b63bf72c4638",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king from e2 to d3",
+    "filename": "speech_2d6499854478b94496c14778b5cebc74.wav",
+    "category": "legal_moves",
+    "duration": 1.6718125,
+    "checksum": "6a5f30c2ce4dce7955b255fa5730460fba3bafe141498349396eb9fefb6389b3",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn from a2 to a3",
+    "filename": "speech_a603ff79a2b33a93b83448be4ecd9c02.wav",
+    "category": "legal_moves",
+    "duration": 1.637,
+    "checksum": "03e653409db19068219c4a5384cbd5de8ec70babf77eb96e79b52499f6f755d3",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight takes pawn on e4",
+    "filename": "speech_5c8d4bb6c820cbf0d8ff01d143e4b5c5.wav",
+    "category": "captures",
+    "duration": 1.9620625,
+    "checksum": "014fafce2e0584a916bd512e71300e6b48c2d3f88ece570ad06bb0f6922e9df0",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop takes knight on c6",
+    "filename": "speech_16975bacd143a46861c861adc8f9c83a.wav",
+    "category": "captures",
+    "duration": 1.98525,
+    "checksum": "8cb57fe733fd359da5efc927af184fbaad8e435224312ab896d3742cfc8465a8",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen takes pawn on f7",
+    "filename": "speech_9df1d84257b51bdb609e5b9f869098ce.wav",
+    "category": "captures",
+    "duration": 1.7530625,
+    "checksum": "0ae156914c201bd43984b84ffccb9c7df3668024cf840cd62388fd57bba1aca0",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn takes pawn on d5",
+    "filename": "speech_be177cf90321c28d8154bde8ccf2665b.wav",
+    "category": "captures",
+    "duration": 1.787875,
+    "checksum": "34077b277d08b656ef337485b9037f91dbfe2208d757648e274352a53784df62",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook takes rook on d8",
+    "filename": "speech_ba9ded40aafc51490dc7cbfd88a6614f.wav",
+    "category": "captures",
+    "duration": 1.637,
+    "checksum": "a9f83839e4b5ba486e9098ca7c0f3b36ce784ae2787deb215e4206300f17e326",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king takes queen on f2",
+    "filename": "speech_bbc02566385d765f8eb6cf55313167d3.wav",
+    "category": "captures",
+    "duration": 1.729875,
+    "checksum": "c72889e19a92fd70422efd43ed2f61caa86cfd837b7043ec617f1cf27f2c2c85",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight captures c3",
+    "filename": "speech_68922edca466cd7148f775681f9b3fdb.wav",
+    "category": "captures",
+    "duration": 1.71825,
+    "checksum": "c864f2528ec6760e9d44fe9e26ad51ab5e670a0ef959c7f24681c5d48c6b53ad",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop captures f7",
+    "filename": "speech_e9f0e5c9e3cd14d6a90130f7df8dc896.wav",
+    "category": "captures",
+    "duration": 1.787875,
+    "checksum": "c6d4d3d36328044007124eaba9530d8f45bd4d2feaa06f36eef40947cb5c5446",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen captures h7",
+    "filename": "speech_b2266c1fd929b14ffc23cfd67479c34d.wav",
+    "category": "captures",
+    "duration": 1.6601875,
+    "checksum": "bb5595e095b5af2c40d9e872d4d7434fc283e8237ffb863c1061f565af5814c6",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn captures e5",
+    "filename": "speech_87a07944885c5a30a8cb89530d4edef7.wav",
+    "category": "captures",
+    "duration": 1.497625,
+    "checksum": "e22b0dcf3d911833c61275ecd773fb19245cdf74932a7fcb5bd190dd5a934c4a",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook captures d1",
+    "filename": "speech_60a2a87bd14d3a0c369b25f55b1d8760.wav",
+    "category": "captures",
+    "duration": 1.3235,
+    "checksum": "d67ff67929a72afb8e0b4dfda0266dd4fa07828506c7eb9d8dd89948c01027b5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king captures g2",
+    "filename": "speech_291078f8e04e25b4e596ef938a9d6334.wav",
+    "category": "captures",
+    "duration": 1.5905625,
+    "checksum": "c917db51a57f0991673576d036b81a721b348717743b626e19279965395c36f8",
+    "status": "VALID"
+  },
+  {
+    "phrase": "takes on d4",
+    "filename": "speech_75eaf56afcfcf1e8475cf15b23bd58eb.wav",
+    "category": "captures",
+    "duration": 1.1029375,
+    "checksum": "77e2c7e985e1a5c13ec1bb6ca2f51d0ceb313bf66f5f984e0b996bb8e6ff1b8b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "captures on e5",
+    "filename": "speech_143751de85b42c19a703a4493e9f9979.wav",
+    "category": "captures",
+    "duration": 1.311875,
+    "checksum": "23aaeb9a4a65d1579c4306f4e2a57d68bd336ce3e585b1d5832f524d43ffa2cd",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn captures on c3",
+    "filename": "speech_79f1e07951defac0e16d50c4d41047aa.wav",
+    "category": "captures",
+    "duration": 1.8691875,
+    "checksum": "5df20bf79bb2f330cb853959ab67ec64eacf4b4237237d38a236ee38cb37bb74",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to h5 giving check",
+    "filename": "speech_cfbc2cd8aa772d20de8b82419a28247b.wav",
+    "category": "checks",
+    "duration": 1.787875,
+    "checksum": "85057daa71ef9cba3641776e3f585d45e520b4601cbdec9d5625e84371942ced",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop to b5 giving check",
+    "filename": "speech_7ba7f29fa1c2fcec09bc16f3d457086c.wav",
+    "category": "checks",
+    "duration": 1.7414375,
+    "checksum": "3107c7d29a7b3170a66515bd12b2c8203a7e075799e178af956939899ed8f4ae",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to f6 giving check",
+    "filename": "speech_e4c5e01f4073623c375eaa5c21cc0407.wav",
+    "category": "checks",
+    "duration": 1.706625,
+    "checksum": "0e82a9d540859e97047b8ad8814d0a26ead91a506972f6b911c4ee2ba31842bb",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to e8 giving check",
+    "filename": "speech_9566a199c53b00761072c4e8fc68294a.wav",
+    "category": "checks",
+    "duration": 1.6834375,
+    "checksum": "2977be1a059187ab3e9c266f8afe19bd8ec0f2cf7aeff1f5f699e5f11db8a0e6",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to d6 giving check",
+    "filename": "speech_caa5665a017dc483d874dab095931c08.wav",
+    "category": "checks",
+    "duration": 1.544125,
+    "checksum": "2c4d8afb8f60256dd50b1297337a795d7c38b44cf49a5d3da181346df4629154",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to e7 giving check",
+    "filename": "speech_08a072221e911a25c6869b0a084b4489.wav",
+    "category": "checks",
+    "duration": 1.6718125,
+    "checksum": "23d452240cffaff310ab87b374c961649ae0ec6e9ac6988719d691ad74c3d5e2",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop to c4 giving check",
+    "filename": "speech_b388cb383a236bd96f1fc0c4b28c4177.wav",
+    "category": "checks",
+    "duration": 1.834375,
+    "checksum": "668a46797d325b1b8cbd701a6fddfcbc8f0d2aba05d3e07f90183e305d389da4",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to d6 check",
+    "filename": "speech_4879e2552158aa1fcab4dad916d1aea9.wav",
+    "category": "checks",
+    "duration": 1.3931875,
+    "checksum": "0307d294fa11a43eede675d66313a537f553676180f2ccc9872f3eda9f598f61",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to d8 check",
+    "filename": "speech_be475ed9cf6d85edea150f4cfba493ee.wav",
+    "category": "checks",
+    "duration": 1.416375,
+    "checksum": "ae712c9cef0c6572eac74df88dbbfa2258e1cb038534b548d1296ae86309d3f1",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to a4 check",
+    "filename": "speech_b6a4892040fdc0771f6334584582394a.wav",
+    "category": "checks",
+    "duration": 1.2770625,
+    "checksum": "bd62ce1c18cd1dd46cd3abc67c00de9784e57af846549f2272091da045841efb",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to f7 delivering checkmate",
+    "filename": "speech_0f6e2c5551a19065c30053a1a28d9591.wav",
+    "category": "checkmates",
+    "duration": 2.0085,
+    "checksum": "a078affa7b6011b1cabd0a7e05053e3fd64059366bf0888784e725798247237b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to h8 delivering checkmate",
+    "filename": "speech_87724f5274fb8e7da3e3aa98f1f2eba1.wav",
+    "category": "checkmates",
+    "duration": 1.9504375,
+    "checksum": "5aedaecd5125515054f545fd4706132d55f39963c94b82fabd71679cb6bbaca0",
+    "status": "VALID"
+  },
+  {
+    "phrase": "bishop to f7 delivering checkmate",
+    "filename": "speech_6d264422dc65ce0aeb3bcdf588667e67.wav",
+    "category": "checkmates",
+    "duration": 2.3335625,
+    "checksum": "361a0721d47b51f44b075be4ace566d28416f204a5979c7ca9919e05334fa725",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to f7 delivering checkmate",
+    "filename": "speech_8db3c333285c022bff89e8cd99f1b22d.wav",
+    "category": "checkmates",
+    "duration": 1.9620625,
+    "checksum": "b2760353472cbe9fb784c85151045df26a6c7ad7c976065483f8236dcbbb7e2d",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to e8 delivering checkmate",
+    "filename": "speech_e6f13c03346c1ac305ccc1ef58399059.wav",
+    "category": "checkmates",
+    "duration": 1.98525,
+    "checksum": "8010f86a1a8b4a5230aab1a6d8ec8d0e58a59e001e273bfe86ae98f5f45a6656",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to d8 delivering checkmate",
+    "filename": "speech_53572477441a69880b4cc2962c002b4c.wav",
+    "category": "checkmates",
+    "duration": 2.08975,
+    "checksum": "9abe08017b1f652ff7f8ba690a4d505c609d654ebd9541c1b3a1d1e91b89b480",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to g7 mate",
+    "filename": "speech_452faae1be275c27b8b423ac24e1aafa.wav",
+    "category": "checkmates",
+    "duration": 1.3003125,
+    "checksum": "b0014f56b3ef52b7b8b08aa026662222ec7db657b4f5de04c76ccc2c3e9cd7bd",
+    "status": "VALID"
+  },
+  {
+    "phrase": "rook to h8 mate",
+    "filename": "speech_117cbff69fe94f398b9d5476468c0343.wav",
+    "category": "checkmates",
+    "duration": 1.3003125,
+    "checksum": "59bac396b48d913590412063702b8d181c1446ca767c960120a9f914db1b24c7",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight to f7 mate",
+    "filename": "speech_4440cc596c2be3d18197111725c01ec6.wav",
+    "category": "checkmates",
+    "duration": 1.2654375,
+    "checksum": "8a1cef361fca0cc51a0defc676d8c74997af779d54ffa2cb662c15ded9db91b5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queen to f8 mate",
+    "filename": "speech_20d53c14df7ee52247f163df90727a2c.wav",
+    "category": "checkmates",
+    "duration": 1.2770625,
+    "checksum": "ca411dc821f1cf3db1ce3fd028c361db9767c12086792ed480f7e6af0da0d9b8",
+    "status": "VALID"
+  },
+  {
+    "phrase": "castle kingside",
+    "filename": "speech_9eb48a16dff1909d5be54346d91d3ce0.wav",
+    "category": "castling",
+    "duration": 1.230625,
+    "checksum": "1b6a76c372f353e0d797a21135302a1e9164847387485bf0137d07c8f6df47a2",
+    "status": "VALID"
+  },
+  {
+    "phrase": "castle queenside",
+    "filename": "speech_d3078c9aec32f4ffe5faef322b683d30.wav",
+    "category": "castling",
+    "duration": 1.253875,
+    "checksum": "1f81dd2dcc405d258c7b536950f0d1b1bf45e1f7b3d9fcc054c17f33315b8ad5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "castle short",
+    "filename": "speech_4e2bf96dcbc4312b1a2658c8fa872bef.wav",
+    "category": "castling",
+    "duration": 0.859125,
+    "checksum": "b07c64f5b837c5af9c292257106d4d3bde3b6faa7385c0d651ce0ecdffd6dff5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "castle long",
+    "filename": "speech_4add850eb6a8a8361107c929c13617d5.wav",
+    "category": "castling",
+    "duration": 0.7778125,
+    "checksum": "61f07d126d0109da541f210bb7bdc0656ff326be39e5121ec5c294590c48af6f",
+    "status": "VALID"
+  },
+  {
+    "phrase": "kingside castling",
+    "filename": "speech_13f3aad7fbf4e7e0e48e7f5166e76c35.wav",
+    "category": "castling",
+    "duration": 1.3583125,
+    "checksum": "e6531b5a95d45e6b3e9fbbf4fa18453fceb9499e360c10e67c2928e29b2032d2",
+    "status": "VALID"
+  },
+  {
+    "phrase": "queenside castling",
+    "filename": "speech_d8008fe7fe4a99586bb170ec4db80066.wav",
+    "category": "castling",
+    "duration": 1.1958125,
+    "checksum": "ffa61e1bc40a6651bb07ef3681a4dd3fb3507fdfabfd63333a5a28e108d1bd12",
+    "status": "VALID"
+  },
+  {
+    "phrase": "short castling",
+    "filename": "speech_71f8a1612dd02dcc85c5c16a61442670.wav",
+    "category": "castling",
+    "duration": 0.940375,
+    "checksum": "066c7beaeeef6214e6dda477f895abce4a2fff0ad2ed82e0b9b82a93560fb8df",
+    "status": "VALID"
+  },
+  {
+    "phrase": "long castling",
+    "filename": "speech_e80dfa610f35c09256498fb3de94900b.wav",
+    "category": "castling",
+    "duration": 1.149375,
+    "checksum": "e9210db6b02fbb2c9ea3b4f04e411bab149a4ec3292391268e129161bb4d856b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move castle kingside",
+    "filename": "speech_39fe9ce9c25a55b187adf1bf4db21239.wav",
+    "category": "castling",
+    "duration": 1.5556875,
+    "checksum": "50b65045522fa7ca76b4cdde6fd9995b0076f57e9cd637e49eba5e2b7a043581",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move castle queenside",
+    "filename": "speech_2427f225ff9a8703f9f5c504a5ec3140.wav",
+    "category": "castling",
+    "duration": 1.6834375,
+    "checksum": "3c02da0962a7a22af0dfbbb937c9503915ab1d4a9a94342edf3d32d34fe0179b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to e8 promote to queen",
+    "filename": "speech_f900c3190cbad6a0ccae1f8445dddc10.wav",
+    "category": "promotions",
+    "duration": 1.8691875,
+    "checksum": "e7dcca9cd6c29584ff660b2042e7d5149799f803820831c77d23fc8682cfe216",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to d8 promote to rook",
+    "filename": "speech_028e0660df059caf002227d66dac94d2.wav",
+    "category": "promotions",
+    "duration": 1.7646875,
+    "checksum": "21d9b463b540928bed93e7164202952e08fffab17267fb371f4e1a369eea9dd8",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to c8 promote to bishop",
+    "filename": "speech_6a1aad8a2f7b5a31f7577e7ad27b95b4.wav",
+    "category": "promotions",
+    "duration": 1.9388125,
+    "checksum": "5ed0727c51933668d87eea80c3641ed5904dc5bfd37c3e045fd5b186f8c71de5",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to b8 promote to knight",
+    "filename": "speech_b8d4fa04880b4ec6c94a5ecf4eb6c6ff.wav",
+    "category": "promotions",
+    "duration": 1.625375,
+    "checksum": "8b2c42816457e31e08ab20d1516a6198a72a400563fa1ee4df3a25c730ea1702",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to f8 promoting to queen",
+    "filename": "speech_dcb04ae45a9d024da0ac08ad608d2c16.wav",
+    "category": "promotions",
+    "duration": 2.124625,
+    "checksum": "d021e3b21cd7a12d8c90a9cecc45ae3004aea06df03f691b13c6354a4da8d692",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to g8 promoting to rook",
+    "filename": "speech_62b2c5381d8eac184862fee7c34eeb2c.wav",
+    "category": "promotions",
+    "duration": 1.8575625,
+    "checksum": "2d3a0b1472df5e02b51884f693578b4ef2d8d126dadbcac8259bdfb73cc4652b",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to a8 promoting to bishop",
+    "filename": "speech_0cc404980520abb2237cf6218ed2f5df.wav",
+    "category": "promotions",
+    "duration": 1.9620625,
+    "checksum": "07f1c766e758a5bdf174e048daf57a4384f4466cf9a480a82a0466bb9e21ba5a",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn to h8 promoting to knight",
+    "filename": "speech_8fc4c607283ae6ac7ee4758c49b09d71.wav",
+    "category": "promotions",
+    "duration": 1.8808125,
+    "checksum": "c08d46c60f50f2586dca16cbb06abe7950989f3ab00042b6ab1b01f13a65c7c6",
+    "status": "VALID"
+  },
+  {
+    "phrase": "promote pawn to queen on e8",
+    "filename": "speech_fe37b474a0c549d4b3fe869774bc4936.wav",
+    "category": "promotions",
+    "duration": 1.892375,
+    "checksum": "eec2b503dd366be3f84c1efd916a0ad78f6eedb506bb0ab0e63d3be7169188fc",
+    "status": "VALID"
+  },
+  {
+    "phrase": "promote pawn to rook on d8",
+    "filename": "speech_137aab7e992c7fc9e1773ebd4bb34b47.wav",
+    "category": "promotions",
+    "duration": 2.0085,
+    "checksum": "953980868a87604a04c7f46a7e75bd9c7bd7c6477b1a99132a9d6a73d9dd4cdc",
+    "status": "VALID"
+  },
+  {
+    "phrase": "move is invalid",
+    "filename": "speech_911f9bd2d87c4751ec1887be8dbbc163.wav",
+    "category": "invalid_moves",
+    "duration": 1.1145,
+    "checksum": "d9b2e019a91aaf3a902b3b0fee1b4cdf74920dc0b5dbfcd0260ca568d630a302",
+    "status": "VALID"
+  },
+  {
+    "phrase": "square is empty",
+    "filename": "speech_30a5198c74e9661bf7f59d191d7bdc89.wav",
+    "category": "invalid_moves",
+    "duration": 0.940375,
+    "checksum": "d4e5e079acdcb1f7004099a3a482c2a75eb6e3d8b21a0d1b90be725f42b90d78",
+    "status": "VALID"
+  },
+  {
+    "phrase": "pawn cannot move there",
+    "filename": "speech_32f463e888fa01b858a2184ac8cd74aa.wav",
+    "category": "invalid_moves",
+    "duration": 1.335125,
+    "checksum": "bcb7ed96d7a0ec115079c4ac647a341aff0c3fd151347f9b0e762835edb11a7f",
+    "status": "VALID"
+  },
+  {
+    "phrase": "knight cannot jump there",
+    "filename": "speech_9108e36054a3f43ad4f29a3ec8ba1612.wav",
+    "category": "invalid_moves",
+    "duration": 1.3583125,
+    "checksum": "163182ea6edc68d1453aaebd785149635e14c62f43e82667cc414275a5a3af68",
+    "status": "VALID"
+  },
+  {
+    "phrase": "king is in check",
+    "filename": "speech_d79665617c3d747abfb2c153562ec404.wav",
+    "category": "invalid_moves",
+    "duration": 0.963625,
+    "checksum": "2dc670f1ac4a94a847a042966241918b8dcdaa00190e2c5dae433c65d826565c",
+    "status": "VALID"
+  },
+  {
+    "phrase": "no legal moves available",
+    "filename": "speech_42ddae06b59520ba9189b1874450933f.wav",
+    "category": "invalid_moves",
+    "duration": 1.520875,
+    "checksum": "301ea7177c640eeaafd8fc25e99491ff36ddad98b55adb3a1d7ebdea99081448",
+    "status": "VALID"
+  },
+  {
+    "phrase": "that move is not allowed",
+    "filename": "speech_272a6adf20936788913fa128dabe8cbc.wav",
+    "category": "invalid_moves",
+    "duration": 1.544125,
+    "checksum": "9c5e1af8658d3741c418001576d10a86842fea72b8b2a742719d09cced5cee11",
+    "status": "VALID"
+  },
+  {
+    "phrase": "invalid coordinates",
+    "filename": "speech_9db635d4a1dac7959baa50b7d9676036.wav",
+    "category": "invalid_moves",
+    "duration": 1.4511875,
+    "checksum": "3869f4305f2b1373a468ee36e9172863867202f2922001dd1dc9b4f37776fb99",
+    "status": "VALID"
+  },
+  {
+    "phrase": "piece cannot move there",
+    "filename": "speech_bd1d0bfd17079d516323b91aa3d5b946.wav",
+    "category": "invalid_moves",
+    "duration": 1.40475,
+    "checksum": "485340f4ae87f4b8586db4b1c74a4258f451275dc90708e6ad059a26c14d8ba1",
+    "status": "VALID"
+  },
+  {
+    "phrase": "castling is not legal",
+    "filename": "speech_34b26c144f989e1168a29cf0b8e3bef8.wav",
+    "category": "invalid_moves",
+    "duration": 1.5556875,
+    "checksum": "6af70bf419e6bd3576981932096bf150497b005cd1fd36159296dff70f940608",
+    "status": "VALID"
+  }
+]
