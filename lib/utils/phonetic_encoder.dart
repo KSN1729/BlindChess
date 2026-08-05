@@ -1,3 +1,6 @@
+import '../config/square_dictionary.dart';
+import '../config/number_dictionary.dart';
+
 class PhoneticEncoder {
   static final PhoneticEncoder instance = PhoneticEncoder._();
   PhoneticEncoder._();
@@ -15,39 +18,29 @@ class PhoneticEncoder {
     }
 
     // Number word homophones
-    final numberMap = {
-      'one': '1',
-      'won': '1',
-      'two': '2',
-      'too': '2',
-      'to': '2',
-      'three': '3',
-      'four': '4',
-      'fore': '4',
-      'for': '4',
-      'five': '5',
-      'six': '6',
-      'seven': '7',
-      'eight': '8',
-      'ate': '8',
-    };
+    final Map<String, String> numberMap = {};
+    for (final entry in rankDictionary.entries) {
+      final canonical = entry.key;
+      for (final synonym in entry.value) {
+        if (synonym != canonical) {
+          numberMap[synonym] = canonical;
+        }
+      }
+    }
     if (numberMap.containsKey(clean)) {
       return 'N${numberMap[clean]}'.padRight(4, '0').substring(0, 4);
     }
 
     // File homophones
-    final fileMap = {
-      'bee': 'b',
-      'be': 'b',
-      'v': 'b',
-      'sea': 'c',
-      'see': 'c',
-      'cee': 'c',
-      'dee': 'd',
-      'eff': 'f',
-      'gee': 'g',
-      'aitch': 'h',
-    };
+    final Map<String, String> fileMap = {};
+    for (final entry in fileDictionary.entries) {
+      final canonical = entry.key;
+      for (final synonym in entry.value) {
+        if (synonym != canonical) {
+          fileMap[synonym] = canonical;
+        }
+      }
+    }
     if (fileMap.containsKey(clean)) {
       clean = fileMap[clean]!;
     }

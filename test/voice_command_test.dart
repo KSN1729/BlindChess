@@ -438,7 +438,7 @@ void main() {
     test('SquareNormalizer independent unit test', () {
       expect(SquareNormalizer.normalize('bee eight')?['square'], equals('b8'));
       expect(SquareNormalizer.normalize('be eight')?['square'], equals('b8'));
-      expect(SquareNormalizer.normalize('v8')?['square'], equals('b8'));
+      expect(SquareNormalizer.normalize('v8'), isNull);
       expect(SquareNormalizer.normalize('see four')?['square'], equals('c4'));
       expect(SquareNormalizer.normalize('sea four')?['square'], equals('c4'));
       expect(SquareNormalizer.normalize('dee five')?['square'], equals('d5'));
@@ -450,7 +450,7 @@ void main() {
       // Verify digit/word aliases
       expect(SquareNormalizer.normalizeFile('bee')?['file'], equals('b'));
       expect(SquareNormalizer.normalizeFile('be')?['file'], equals('b'));
-      expect(SquareNormalizer.normalizeFile('v')?['file'], equals('b'));
+      expect(SquareNormalizer.normalizeFile('v'), isNull);
       expect(SquareNormalizer.normalizeFile('sea')?['file'], equals('c'));
       expect(SquareNormalizer.normalizeFile('see')?['file'], equals('c'));
       expect(SquareNormalizer.normalizeFile('dee')?['file'], equals('d'));
@@ -1123,10 +1123,7 @@ void main() {
         VoiceCommandParser.parseCommand('be f3', legalMoves),
         equals(legalMoves[5]),
       );
-      expect(
-        VoiceCommandParser.parseCommand('v f3', legalMoves),
-        equals(legalMoves[5]),
-      );
+
 
       expect(
         VoiceCommandParser.parseCommand('sea d3', legalMoves),

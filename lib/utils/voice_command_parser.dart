@@ -16,12 +16,97 @@ class TextNormalizer {
     debugPrint('TextNormalizer INPUT: $text');
     var clean = text.toLowerCase().replaceAll(RegExp(r'[.,!?\-]'), ' ').trim();
 
-    // Clean up spacing and connectors in coordinates:
-    // e.g. "e to 4" -> "e4", "e 4" -> "e4"
+    // Clean king side / queen side spaces and format castling
+    clean = clean
+        .replaceAll(RegExp(r'\bking\s+side\b'), 'kingside')
+        .replaceAll(RegExp(r'\bqueen\s+side\b'), 'queenside')
+        .replaceAll('o o o', 'o-o-o')
+        .replaceAll('o o', 'o-o');
+
+    // Normalize spelling alphabet / phonetic letters to standard A-H letters
+    final Map<String, String> fileSynonyms = {};
+    for (final entry in fileDictionary.entries) {
+      final canonical = entry.key;
+      for (final synonym in entry.value) {
+        if (synonym != canonical) {
+          fileSynonyms[synonym] = canonical;
+        }
+      }
+    }
+    fileSynonyms.forEach((syn, canonical) {
+      clean = clean.replaceAll(RegExp('\\b$syn\\b'), canonical);
+    });
+
+    // Merge file letters [a-h] + connector + rank synonyms (e.g. "e to 4" -> "e4", "e on four" -> "e4")
+    final Map<String, String> rankMapping = {};
+    for (final entry in rankDictionary.entries) {
+      final canonical = entry.key;
+      for (final synonym in entry.value) {
+        rankMapping[synonym] = canonical;
+      }
+    }
+
     clean = clean.replaceAllMapped(
-      RegExp(r'\b([a-h])\s+to\s+([1-8])\b', caseSensitive: false),
-      (m) => '${m.group(1)}${m.group(2)}',
+      RegExp(r'\b([a-h])\s+(to|on|at|for|takes|take|captures|capture)\s+(one|won|first|wun|two|too|to|tu|three|third|tree|four|fore|for|fourth|foar|five|fifth|fiv|six|sixth|sicks|seven|seventh|sevn|eight|ate|eighth|eit|[1-8])\b', caseSensitive: false),
+      (m) {
+        final file = m.group(1)!;
+        final rankWord = m.group(3)!.toLowerCase();
+        final rankDigit = rankMapping[rankWord] ?? rankWord;
+        return '$file$rankDigit';
+      },
     );
+
+    // Merge file letters [a-h] with adjacent rank synonyms (e.g. "e 4" -> "e4", "e to" -> "e2")
+    // Rank 1
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(one|won|first|wun|1)\b', caseSensitive: false),
+      (m) => '${m.group(1)}1',
+    );
+    // Rank 2
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(to|too|two|tu|2)\b', caseSensitive: false),
+      (m) => '${m.group(1)}2',
+    );
+    // Rank 3
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(three|third|tree|3)\b', caseSensitive: false),
+      (m) => '${m.group(1)}3',
+    );
+    // Rank 4
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(for|fore|four|fourth|foar|4)\b', caseSensitive: false),
+      (m) => '${m.group(1)}4',
+    );
+    // Rank 5
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(five|fifth|fiv|5)\b', caseSensitive: false),
+      (m) => '${m.group(1)}5',
+    );
+    // Rank 6
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(six|sixth|sicks|6)\b', caseSensitive: false),
+      (m) => '${m.group(1)}6',
+    );
+    // Rank 7
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(seven|seventh|sevn|7)\b', caseSensitive: false),
+      (m) => '${m.group(1)}7',
+    );
+    // Rank 8
+    clean = clean.replaceAllMapped(
+      RegExp(r'\b([a-h])\s+(eight|ate|eighth|eit|8)\b', caseSensitive: false),
+      (m) => '${m.group(1)}8',
+    );
+
+    // Remove optional/filler words that are not part of the core chess intent
+    clean = clean
+        .replaceAll(RegExp(r'\b(move|to|on|at|for)\b'), ' ')
+        .replaceAll(RegExp(r'\b(takes|take|captures|capture|x)\b'), ' ')
+        .replaceAll(RegExp(r'\b(promote to|promotion|promote|promoting|promotes)\b'), ' ')
+        .replaceAll(RegExp(r'\b(checkmate|check|mate)\b'), ' ');
+
+    // Clean up spacing in coordinates:
+    // e.g. "e 4" -> "e4"
     clean = clean.replaceAllMapped(
       RegExp(r'\b([a-h])\s+([1-8])\b', caseSensitive: false),
       (m) => '${m.group(1)}${m.group(2)}',
@@ -331,6 +416,12 @@ class VoiceIntent {
   final bool isKingsideCastling;
   final bool isQueensideCastling;
   final double confidence;
+  final bool isCapture;
+  final bool isCheck;
+  final bool isCheckmate;
+  final bool isPromotion;
+  final String? promotionPiece;
+  final List<String> synonymsUsed;
 
   VoiceIntent({
     this.piece,
@@ -341,22 +432,98 @@ class VoiceIntent {
     this.isKingsideCastling = false,
     this.isQueensideCastling = false,
     this.confidence = 1.0,
+    this.isCapture = false,
+    this.isCheck = false,
+    this.isCheckmate = false,
+    this.isPromotion = false,
+    this.promotionPiece,
+    this.synonymsUsed = const [],
   });
 
   /// Extracts the voice intent components from the normalized text.
-  static VoiceIntent parse(String text) {
-    debugPrint('VoiceIntent INPUT: $text');
-    final cleanText = text.toLowerCase().trim();
+  static VoiceIntent parse(String text, {String? rawText}) {
+    final cleanRaw = (rawText ?? text).toLowerCase().trim();
+    debugPrint('VoiceIntent INPUT: text="$text", rawText="$cleanRaw"');
 
     final isKingside =
-        cleanText.contains('kingside') ||
-        cleanText.contains('short') ||
-        cleanText == 'castle' ||
-        cleanText.contains('short castle');
+        cleanRaw.contains('kingside') ||
+        cleanRaw.contains('short') ||
+        cleanRaw == 'castle' ||
+        cleanRaw.contains('short castle') ||
+        cleanRaw.contains('king side') ||
+        cleanRaw == 'o-o';
     final isQueenside =
-        cleanText.contains('queenside') ||
-        cleanText.contains('long') ||
-        cleanText.contains('long castle');
+        cleanRaw.contains('queenside') ||
+        cleanRaw.contains('long') ||
+        cleanRaw.contains('long castle') ||
+        cleanRaw.contains('queen side') ||
+        cleanRaw == 'o-o-o';
+
+    final hasCapture = cleanRaw.contains('takes') ||
+        cleanRaw.contains('take') ||
+        cleanRaw.contains('captures') ||
+        cleanRaw.contains('capture') ||
+        cleanRaw.split(RegExp(r'\s+')).contains('x');
+
+    final hasPromotion = cleanRaw.contains('promote') ||
+        cleanRaw.contains('promotion') ||
+        cleanRaw.contains('promoting') ||
+        cleanRaw.contains('promotes');
+
+    final hasCheckmate = cleanRaw.contains('checkmate') || cleanRaw.contains('mate');
+    final hasCheck = cleanRaw.contains('check') || hasCheckmate;
+
+    String? promotionPiece;
+    if (hasPromotion) {
+      for (final entry in pieceDictionary.entries) {
+        if (entry.key == 'king' || entry.key == 'pawn') continue;
+        for (final syn in entry.value) {
+          if (cleanRaw.contains(syn)) {
+            final pMap = {
+              'queen': 'q',
+              'rook': 'r',
+              'knight': 'n',
+              'bishop': 'b',
+            };
+            promotionPiece = pMap[entry.key];
+            break;
+          }
+        }
+        if (promotionPiece != null) break;
+      }
+    }
+
+    final synonymsUsed = <String>[];
+    final wordsForSyn = cleanRaw.split(RegExp(r'\s+'));
+    for (final word in wordsForSyn) {
+      // Piece synonym check
+      for (final entry in pieceDictionary.entries) {
+        for (final syn in entry.value) {
+          if (word == syn && word != entry.key) {
+            synonymsUsed.add('$word -> ${entry.key}');
+            break;
+          }
+        }
+      }
+      // File synonym check
+      for (final entry in fileDictionary.entries) {
+        for (final syn in entry.value) {
+          if (word == syn && word != entry.key) {
+            synonymsUsed.add('$word -> ${entry.key}');
+            break;
+          }
+        }
+      }
+      // Rank synonym check
+      for (final entry in rankDictionary.entries) {
+        for (final syn in entry.value) {
+          if (word == syn && word != entry.key) {
+            synonymsUsed.add('$word -> ${entry.key}');
+            break;
+          }
+        }
+      }
+    }
 
     if (isKingside || isQueenside) {
       final intent = VoiceIntent(
@@ -364,6 +531,12 @@ class VoiceIntent {
         isKingsideCastling: isKingside,
         isQueensideCastling: isQueenside,
         confidence: 1.0,
+        isCapture: hasCapture,
+        isCheck: hasCheck,
+        isCheckmate: hasCheckmate,
+        isPromotion: hasPromotion,
+        promotionPiece: promotionPiece,
+        synonymsUsed: synonymsUsed.toSet().toList(),
       );
       debugPrint(
         'VoiceIntent OUTPUT: piece=${intent.piece}, destinationSquare=${intent.destinationSquare}, isKingside=${intent.isKingsideCastling}, isQueenside=${intent.isQueensideCastling}, confidence=${intent.confidence}',
@@ -371,7 +544,7 @@ class VoiceIntent {
       return intent;
     }
 
-    final words = cleanText.split(RegExp(r'\s+'));
+    final words = text.split(RegExp(r'\s+'));
     final List<Map<String, dynamic>> detectedSquares = [];
     int i = 0;
     while (i < words.length) {
@@ -518,6 +691,12 @@ class VoiceIntent {
           originSquare: originSquare,
           destinationSquare: targetSq,
           confidence: confidence,
+          isCapture: hasCapture,
+          isCheck: hasCheck,
+          isCheckmate: hasCheckmate,
+          isPromotion: hasPromotion,
+          promotionPiece: promotionPiece,
+          synonymsUsed: synonymsUsed.toSet().toList(),
         );
       } else {
         final origin = detectedSquares[0]['square'] as String;
@@ -532,6 +711,12 @@ class VoiceIntent {
           originRank: origin[1],
           destinationSquare: dest,
           confidence: confidence,
+          isCapture: hasCapture,
+          isCheck: hasCheck,
+          isCheckmate: hasCheckmate,
+          isPromotion: hasPromotion,
+          promotionPiece: promotionPiece,
+          synonymsUsed: synonymsUsed.toSet().toList(),
         );
       }
     } else if (detectedSquares.length == 1) {
@@ -620,12 +805,35 @@ class VoiceIntent {
         originSquare: originSquare,
         destinationSquare: targetSq,
         confidence: confidence,
+        isCapture: hasCapture,
+        isCheck: hasCheck,
+        isCheckmate: hasCheckmate,
+        isPromotion: hasPromotion,
+        promotionPiece: promotionPiece,
+        synonymsUsed: synonymsUsed.toSet().toList(),
       );
     } else {
       if (pieceChar != null) {
-        intent = VoiceIntent(piece: pieceChar, confidence: pieceConf);
+        intent = VoiceIntent(
+          piece: pieceChar,
+          confidence: pieceConf,
+          isCapture: hasCapture,
+          isCheck: hasCheck,
+          isCheckmate: hasCheckmate,
+          isPromotion: hasPromotion,
+          promotionPiece: promotionPiece,
+          synonymsUsed: synonymsUsed.toSet().toList(),
+        );
       } else {
-        intent = VoiceIntent(confidence: 0.0);
+        intent = VoiceIntent(
+          confidence: 0.0,
+          isCapture: hasCapture,
+          isCheck: hasCheck,
+          isCheckmate: hasCheckmate,
+          isPromotion: hasPromotion,
+          promotionPiece: promotionPiece,
+          synonymsUsed: synonymsUsed.toSet().toList(),
+        );
       }
     }
 
@@ -1518,8 +1726,11 @@ class LegalMoveMatcher {
 
     // Task 2: Confidence Gap Decision
     final autoExecute =
-        (topScore >= VoiceConfidenceConfig.minAbsoluteConfidence) &&
-        (confidenceGap >= VoiceConfidenceConfig.minConfidenceGap);
+        ((topScore >= VoiceConfidenceConfig.minAbsoluteConfidence) &&
+        (confidenceGap >= VoiceConfidenceConfig.minConfidenceGap)) ||
+        ((topMove['similarityScore'] as double) == 1.0 &&
+         topScore >= 0.60 &&
+         (ratedMoves.length == 1 || (topScore - secondScore) >= 0.05));
 
     if (autoExecute) {
       debugPrint('LegalMoveMatcher OUTPUT: ${topMoveMap['san']}');
@@ -1630,6 +1841,7 @@ class VoiceCommandParser {
     required double elapsedTimeMs,
     required double minAbsoluteConfidence,
     required double minConfidenceGap,
+    required VoiceIntent intent,
   }) {
     debugPrint('==================================================');
     debugPrint('VOICE DEBUG MODE');
@@ -1638,6 +1850,11 @@ class VoiceCommandParser {
     debugPrint('Normalized: $normalizedText');
     debugPrint('Encoded: $encodedTokens');
     debugPrint('Legal Moves Considered: ${ratedMoves.length}');
+    debugPrint('Parsed Intent: piece=${intent.piece}, dest=${intent.destinationSquare}, originSq=${intent.originSquare}, originFile=${intent.originFile}, originRank=${intent.originRank}');
+    debugPrint('Synonyms Used: ${intent.synonymsUsed.isEmpty ? "none" : intent.synonymsUsed.join(", ")}');
+    debugPrint('Capture Detection: ${intent.isCapture ? "Yes" : "No"}');
+    debugPrint('Promotion Detection: ${intent.isPromotion ? "Yes (Piece: ${intent.promotionPiece})" : "No"}');
+    debugPrint('Castling Detection: ${intent.isKingsideCastling ? "Yes (Kingside)" : (intent.isQueensideCastling ? "Yes (Queenside)" : "No")}');
     debugPrint('Ranked Scores (all):');
     if (ratedMoves.isEmpty) {
       debugPrint('  none');
@@ -1730,7 +1947,7 @@ class VoiceCommandParser {
       squareStopwatch.stop();
 
       final intentStopwatch = Stopwatch()..start();
-      final parsedIntent = VoiceIntent.parse(normalized);
+      final parsedIntent = VoiceIntent.parse(normalized, rawText: text);
       final intent = VoiceIntent(
         piece: parsedIntent.piece,
         originFile: parsedIntent.originFile,
@@ -1740,6 +1957,12 @@ class VoiceCommandParser {
         isKingsideCastling: parsedIntent.isKingsideCastling,
         isQueensideCastling: parsedIntent.isQueensideCastling,
         confidence: parsedIntent.confidence * sttConfidence,
+        isCapture: parsedIntent.isCapture,
+        isCheck: parsedIntent.isCheck,
+        isCheckmate: parsedIntent.isCheckmate,
+        isPromotion: parsedIntent.isPromotion,
+        promotionPiece: parsedIntent.promotionPiece,
+        synonymsUsed: parsedIntent.synonymsUsed,
       );
       intentStopwatch.stop();
 
@@ -1829,6 +2052,7 @@ class VoiceCommandParser {
           elapsedTimeMs: totalStopwatch.elapsedMicroseconds / 1000.0,
           minAbsoluteConfidence: minAbs,
           minConfidenceGap: minGap,
+          intent: intent,
         );
       }
 
