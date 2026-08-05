@@ -1,10 +1,10 @@
 const Map<String, List<String>> fileDictionary = {
-  'a': ['a', 'ay'],
-  'b': ['b', 'bee', 'be', 'v'],
-  'c': ['c', 'see', 'sea', 'cee'],
-  'd': ['d', 'dee'],
-  'e': ['e', 'ee'],
-  'f': ['f', 'eff'],
-  'g': ['g', 'gee'],
-  'h': ['h', 'aitch'],
+  'a': ['a', 'ay', 'alpha', 'ada'],
+  'b': ['b', 'bee', 'be', 'bravo', 'boy'],
+  'c': ['c', 'see', 'sea', 'cee', 'charlie', 'charly'],
+  'd': ['d', 'dee', 'delta', 'david'],
+  'e': ['e', 'ee', 'echo', 'easy'],
+  'f': ['f', 'eff', 'foxtrot', 'frank'],
+  'g': ['g', 'gee', 'golf', 'george'],
+  'h': ['h', 'aitch', 'hotel', 'harry'],
 };

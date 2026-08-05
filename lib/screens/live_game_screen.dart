@@ -9,9 +9,7 @@ import '../services/statistics_service.dart';
 import '../services/diagnostic_recorder.dart';
 import '../widgets/chess_board.dart';
 import '../widgets/voice_command_widget.dart';
-import '../utils/voice_command_parser.dart';
-import '../utils/tts/tts_base.dart' as tts;
-import '../config/voice_confidence_config.dart';
+import '../services/voice_pipeline_service.dart';
 
 class LiveGameScreen extends StatefulWidget {
   final String gameId;
@@ -29,8 +27,7 @@ class LiveGameScreen extends StatefulWidget {
   State<LiveGameScreen> createState() => _LiveGameScreenState();
 }
 
-class _LiveGameScreenState extends State<LiveGameScreen>
-    with WidgetsBindingObserver {
+class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObserver implements VoicePipelineDelegate {
   final ChessEngineService _chessEngineService = ChessEngineService();
   StreamSubscription<Map<String, dynamic>>? _streamSubscription;
 
@@ -89,6 +86,7 @@ class _LiveGameScreenState extends State<LiveGameScreen>
         widget.initialBlindfoldDifficulty!,
       );
     }
+    VoicePipelineService.instance.setDelegate(this);
     _startStreaming();
   }
 
@@ -412,6 +410,8 @@ class _LiveGameScreenState extends State<LiveGameScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    VoicePipelineService.instance.setDelegate(null);
+    VoicePipelineService.instance.stopPipeline();
     _clockTimer?.cancel();
     _streamSubscription?.cancel();
     _revealTimer?.cancel();
@@ -1492,183 +1492,9 @@ class _LiveGameScreenState extends State<LiveGameScreen>
                         ),
                       ),
                     ),
-
                     VoiceCommandWidget(
                       isEnabled: isMyTurn,
-                      onCommand: (spokenText, {sttConfidence = 1.0}) {
-                        final cleanSpoken = spokenText.toLowerCase().trim();
-
-                        // Voice Undo Check
-                        final undoKeywords = {
-                          'undo',
-                          'cancel',
-                          'wrong',
-                          'stop',
-                        };
-                        if (undoKeywords.contains(cleanSpoken)) {
-                          if (_chessEngineService.getHistory().isNotEmpty) {
-                            final timeSinceLastMove = lastMoveTime != null
-                                ? DateTime.now().difference(lastMoveTime!)
-                                : const Duration(seconds: 999);
-                            if (timeSinceLastMove.inSeconds <=
-                                VoiceConfidenceConfig.undoWindowSeconds) {
-                              final messenger = ScaffoldMessenger.of(context);
-                              LichessService.instance
-                                  .requestTakeback(widget.gameId)
-                                  .then((_) {
-                                    if (!mounted) return;
-                                    messenger.clearSnackBars();
-                                    messenger.showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Takeback requested.'),
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                    tts.speak('Takeback requested.');
-                                  })
-                                  .catchError((e) {
-                                    if (!mounted) return;
-                                    messenger.clearSnackBars();
-                                    messenger.showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Takeback request failed: $e',
-                                        ),
-                                        duration: const Duration(seconds: 2),
-                                      ),
-                                    );
-                                  });
-                              setState(() {
-                                pendingUndoConfirmation = false;
-                              });
-                            } else {
-                              setState(() {
-                                pendingUndoConfirmation = true;
-                              });
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Are you sure you want to request a takeback?',
-                                  ),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                              tts.speak(
-                                'Are you sure you want to request a takeback?',
-                              );
-                            }
-                          } else {
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('No moves to undo.'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
-                            tts.speak('No moves to undo.');
-                          }
-                          return;
-                        }
-
-                        final confirmations = {
-                          'yes',
-                          'yeah',
-                          'sure',
-                          'correct',
-                          'confirm',
-                          'ok',
-                        };
-                        if (confirmations.contains(cleanSpoken)) {
-                          if (pendingUndoConfirmation) {
-                            setState(() {
-                              pendingUndoConfirmation = false;
-                            });
-                            final messenger = ScaffoldMessenger.of(context);
-                            LichessService.instance
-                                .requestTakeback(widget.gameId)
-                                .then((_) {
-                                  if (!mounted) return;
-                                  messenger.clearSnackBars();
-                                  messenger.showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Takeback requested.'),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                  tts.speak('Takeback requested.');
-                                })
-                                .catchError((e) {
-                                  if (!mounted) return;
-                                  messenger.clearSnackBars();
-                                  messenger.showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        'Takeback request failed: $e',
-                                      ),
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
-                                });
-                            return;
-                          }
-                          if (pendingMoveForClarification != null) {
-                            final moveToPlay = pendingMoveForClarification!;
-                            pendingMoveForClarification = null;
-                            _executeMatchedMove(moveToPlay);
-                            return;
-                          }
-                        }
-
-                        // Reset pending undo confirmation on any other spoken command
-                        setState(() {
-                          pendingUndoConfirmation = false;
-                        });
-
-                        final legalMoves = _chessEngineService.getLegalMoves();
-                        final matchedMove = VoiceCommandParser.parseCommand(
-                          spokenText,
-                          legalMoves,
-                          sttConfidence: sttConfidence ?? 1.0,
-                          boardFen: _chessEngineService.fen,
-                        );
-
-                        if (matchedMove != null) {
-                          if (matchedMove.containsKey('error')) {
-                            final errorMsg = matchedMove['error'] as String;
-                            if (matchedMove.containsKey('clarificationMove')) {
-                              pendingMoveForClarification =
-                                  matchedMove['clarificationMove']
-                                      as Map<String, dynamic>;
-                            } else {
-                              pendingMoveForClarification = null;
-                            }
-
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(errorMsg),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                            tts.speak(errorMsg);
-                            return;
-                          }
-
-                          pendingMoveForClarification = null;
-                          _executeMatchedMove(matchedMove);
-                        } else {
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Couldn't understand that move, try again or tap to move",
-                              ),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                        }
-                      },
+                      onCommand: (_, {sttConfidence}) {},
                     ),
 
                     // Footer stats & actions
@@ -1708,39 +1534,58 @@ class _LiveGameScreenState extends State<LiveGameScreen>
     );
   }
 
-  void _executeMatchedMove(Map<String, dynamic> move) {
-    final fromStr = move['from'] as String;
-    final toStr = move['to'] as String;
-    final promotion = move['promotion'] as String?;
 
-    final fromFile = fromStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
-    final fromRow = 8 - int.parse(fromStr[1]);
-    final toFile = toStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
-    final toRow = 8 - int.parse(toStr[1]);
 
-    _transmitMove(fromRow, fromFile, toRow, toFile, promotion: promotion);
+  // ==========================================
+  // VoicePipelineDelegate Overrides
+  // ==========================================
+  @override
+  List<Map<String, dynamic>> getLegalMoves() => _chessEngineService.getLegalMoves();
 
-    final pMap = {
-      'n': 'Knight',
-      'r': 'Rook',
-      'q': 'Queen',
-      'b': 'Bishop',
-      'k': 'King',
-      'p': 'Pawn',
-    };
-    final pieceName = pMap[move['piece']] ?? 'Pawn';
-    final String confirmationText;
-    final san = move['san'] as String? ?? '';
-    if (san.startsWith('O-O-O')) {
-      confirmationText = 'Castles queenside';
-    } else if (san.startsWith('O-O')) {
-      confirmationText = 'Castles kingside';
-    } else if (pieceName == 'Pawn') {
-      confirmationText = toStr;
-    } else {
-      confirmationText = '$pieceName to $toStr';
-    }
+  @override
+  String getFen() => _chessEngineService.fen;
 
+  @override
+  bool makeMove(int fromRow, int fromCol, int toRow, int toCol, {String? promotion}) {
+    _transmitMove(fromRow, fromCol, toRow, toCol, promotion: promotion);
+    return true;
+  }
+
+  @override
+  bool get canUndo => _chessEngineService.getHistory().isNotEmpty;
+
+  @override
+  void undo() {
+    final messenger = ScaffoldMessenger.of(context);
+    LichessService.instance
+        .requestTakeback(widget.gameId)
+        .then((_) {
+          if (!mounted) return;
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
+            const SnackBar(
+              content: Text('Takeback requested.'),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          messenger.clearSnackBars();
+          messenger.showSnackBar(
+            SnackBar(
+              content: Text('Takeback request failed: $e'),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        });
+  }
+
+  @override
+  void onUndoSuccess() {}
+
+  @override
+  void onMoveSuccess(Map<String, dynamic> move, String confirmationText) {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1748,6 +1593,16 @@ class _LiveGameScreenState extends State<LiveGameScreen>
         duration: const Duration(seconds: 2),
       ),
     );
-    tts.speak(confirmationText);
+  }
+
+  @override
+  void onError(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }

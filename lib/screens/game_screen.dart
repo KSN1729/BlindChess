@@ -8,9 +8,7 @@ import '../services/settings_service.dart';
 import '../services/audio_service.dart';
 import '../services/diagnostic_recorder.dart';
 import '../widgets/voice_command_widget.dart';
-import '../utils/voice_command_parser.dart';
-import '../utils/tts/tts_base.dart' as tts;
-import '../config/voice_confidence_config.dart';
+import '../services/voice_pipeline_service.dart';
 import 'stats_screen.dart';
 
 /// Primary game mode screen for pass-and-play matches.
@@ -21,7 +19,7 @@ class GameScreen extends StatefulWidget {
   State<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends State<GameScreen> {
+class _GameScreenState extends State<GameScreen> implements VoicePipelineDelegate {
   // List of files (columns) from A to H to map files to indices.
   final files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
@@ -116,10 +114,13 @@ class _GameScreenState extends State<GameScreen> {
     super.initState();
     isBlindfoldMode = SettingsService.instance.isBlindfoldMode;
     selectedDifficulty = SettingsService.instance.blindfoldDifficulty;
+    VoicePipelineService.instance.setDelegate(this);
   }
 
   @override
   void dispose() {
+    VoicePipelineService.instance.setDelegate(null);
+    VoicePipelineService.instance.stopPipeline();
     _revealTimer?.cancel();
     super.dispose();
   }
@@ -987,135 +988,7 @@ class _GameScreenState extends State<GameScreen> {
 
                 VoiceCommandWidget(
                   isEnabled: !isGameOver,
-                  onCommand: (spokenText, {sttConfidence = 1.0}) {
-                    final cleanSpoken = spokenText.toLowerCase().trim();
-
-                    // Voice Undo Check
-                    final undoKeywords = {'undo', 'cancel', 'wrong', 'stop'};
-                    if (undoKeywords.contains(cleanSpoken)) {
-                      if (chessEngineService.canUndo) {
-                        final timeSinceLastMove = lastMoveTime != null
-                            ? DateTime.now().difference(lastMoveTime!)
-                            : const Duration(seconds: 999);
-                        if (timeSinceLastMove.inSeconds <=
-                            VoiceConfidenceConfig.undoWindowSeconds) {
-                          _performUndo();
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Move undone.'),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                          tts.speak('Move undone.');
-                        } else {
-                          setState(() {
-                            pendingUndoConfirmation = true;
-                          });
-                          ScaffoldMessenger.of(context).clearSnackBars();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Are you sure you want to undo the last move?',
-                              ),
-                              duration: Duration(seconds: 2),
-                            ),
-                          );
-                          tts.speak(
-                            'Are you sure you want to undo the last move?',
-                          );
-                        }
-                      } else {
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('No moves to undo.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        tts.speak('No moves to undo.');
-                      }
-                      return;
-                    }
-
-                    final confirmations = {
-                      'yes',
-                      'yeah',
-                      'sure',
-                      'correct',
-                      'confirm',
-                      'ok',
-                    };
-                    if (confirmations.contains(cleanSpoken)) {
-                      if (pendingUndoConfirmation) {
-                        _performUndo();
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Move undone.'),
-                            duration: Duration(seconds: 2),
-                          ),
-                        );
-                        tts.speak('Move undone.');
-                        return;
-                      }
-                      if (pendingMoveForClarification != null) {
-                        final moveToPlay = pendingMoveForClarification!;
-                        pendingMoveForClarification = null;
-                        _executeMatchedMove(moveToPlay);
-                        return;
-                      }
-                    }
-
-                    // Reset pending undo confirmation on any other spoken command
-                    setState(() {
-                      pendingUndoConfirmation = false;
-                    });
-
-                    final legalMoves = chessEngineService.getLegalMoves();
-                    final matchedMove = VoiceCommandParser.parseCommand(
-                      spokenText,
-                      legalMoves,
-                      sttConfidence: sttConfidence ?? 1.0,
-                      boardFen: chessEngineService.fen,
-                    );
-
-                    if (matchedMove != null) {
-                      if (matchedMove.containsKey('error')) {
-                        final errorMsg = matchedMove['error'] as String;
-                        if (matchedMove.containsKey('clarificationMove')) {
-                          pendingMoveForClarification =
-                              matchedMove['clarificationMove']
-                                  as Map<String, dynamic>;
-                        } else {
-                          pendingMoveForClarification = null;
-                        }
-
-                        ScaffoldMessenger.of(context).clearSnackBars();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(errorMsg),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                        tts.speak(errorMsg);
-                        return;
-                      }
-
-                      pendingMoveForClarification = null;
-                      _executeMatchedMove(matchedMove);
-                    } else {
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            "Couldn't understand that move, try again or tap to move",
-                          ),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                    }
-                  },
+                  onCommand: (_, {sttConfidence}) {},
                 ),
 
                 const SizedBox(height: 12),
@@ -1382,82 +1255,96 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  void _executeMatchedMove(Map<String, dynamic> move) {
-    final fromStr = move['from'] as String;
-    final toStr = move['to'] as String;
-    final promotion = move['promotion'] as String?;
 
-    final fromFile = fromStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
-    final fromRow = 8 - int.parse(fromStr[1]);
-    final toFile = toStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
-    final toRow = 8 - int.parse(toStr[1]);
 
-    final flags = move['flags'] as String?;
-    final isCapture =
-        flags != null && (flags.contains('c') || flags.contains('e'));
+  // ==========================================
+  // VoicePipelineDelegate Overrides
+  // ==========================================
+  @override
+  List<Map<String, dynamic>> getLegalMoves() => chessEngineService.getLegalMoves();
 
+  @override
+  String getFen() => chessEngineService.fen;
+
+  @override
+  bool makeMove(int fromRow, int fromCol, int toRow, int toCol, {String? promotion}) {
+    return chessEngineService.makeMove(fromRow, fromCol, toRow, toCol, promotion: promotion);
+  }
+
+  @override
+  bool get canUndo => chessEngineService.canUndo;
+
+  @override
+  void undo() {
+    _performUndo();
+  }
+
+  @override
+  void onUndoSuccess() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Move undone.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  void onMoveSuccess(Map<String, dynamic> move, String confirmationText) {
     setState(() {
-      final success = chessEngineService.makeMove(
-        fromRow,
-        fromFile,
-        toRow,
-        toFile,
-        promotion: promotion,
-      );
+      final flags = move['flags'] as String?;
+      final isCapture = flags != null && (flags.contains('c') || flags.contains('e'));
+      final isGameOver = this.isGameOver;
 
-      DiagnosticRecorder.instance.updateLastRecordExecution(success: success);
-
-      if (success) {
-        if (chessEngineService.inCheck || isGameOver) {
-          AudioService.instance.playCheck();
-        } else if (isCapture) {
-          AudioService.instance.playCapture();
-        } else {
-          AudioService.instance.playMove();
-        }
-
-        lastMoveStart = (fromRow, fromFile);
-        lastMoveEnd = (toRow, toFile);
-        _moveHistoryCoords.add(((fromRow, fromFile), (toRow, toFile)));
-        lastMoveTime = DateTime.now();
-
-        selectedSquare = null;
-        selectedRow = null;
-        selectedCol = null;
-        highlightedSquares = const [];
-
-        checkGameStatus();
-
-        final pMap = {
-          'n': 'Knight',
-          'r': 'Rook',
-          'q': 'Queen',
-          'b': 'Bishop',
-          'k': 'King',
-          'p': 'Pawn',
-        };
-        final pieceName = pMap[move['piece']] ?? 'Pawn';
-        final String confirmationText;
-        final san = move['san'] as String? ?? '';
-        if (san.startsWith('O-O-O')) {
-          confirmationText = 'Castles queenside';
-        } else if (san.startsWith('O-O')) {
-          confirmationText = 'Castles kingside';
-        } else if (pieceName == 'Pawn') {
-          confirmationText = toStr;
-        } else {
-          confirmationText = '$pieceName to $toStr';
-        }
-
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(confirmationText),
-            duration: const Duration(seconds: 2),
-          ),
-        );
-        tts.speak(confirmationText);
+      if (chessEngineService.inCheck || isGameOver) {
+        AudioService.instance.playCheck();
+      } else if (isCapture) {
+        AudioService.instance.playCapture();
+      } else {
+        AudioService.instance.playMove();
       }
+
+      final fromStr = move['from'] as String;
+      final toStr = move['to'] as String;
+      final fromFile = fromStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
+      final fromRow = 8 - int.parse(fromStr[1]);
+      final toFile = toStr[0].codeUnitAt(0) - 'a'.codeUnitAt(0);
+      final toRow = 8 - int.parse(toStr[1]);
+
+      lastMoveStart = (fromRow, fromFile);
+      lastMoveEnd = (toRow, toFile);
+      _moveHistoryCoords.add(((fromRow, fromFile), (toRow, toFile)));
+      lastMoveTime = DateTime.now();
+
+      selectedSquare = null;
+      selectedRow = null;
+      selectedCol = null;
+      highlightedSquares = const [];
+
+      checkGameStatus();
+
+      DiagnosticRecorder.instance.updateLastRecordExecution(success: true);
+
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(confirmationText),
+          duration: const Duration(seconds: 2),
+        ),
+      );
     });
+  }
+
+  @override
+  void onError(String message) {
+    DiagnosticRecorder.instance.updateLastRecordExecution(success: false);
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 }

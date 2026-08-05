@@ -15,8 +15,14 @@ abstract class SpeechSynthesisService {
   /// Plays the WAV file located at the specified absolute path.
   Future<void> play(String path);
 
+  /// Plays the WAV file located at the specified absolute path and awaits completion.
+  Future<void> playAndWait(String path);
+
   /// Generates and plays the synthesized audio.
   Future<void> speak(String text, {String boardId = 'default', String category = 'move'});
+
+  /// Generates and plays the synthesized audio, awaiting completion.
+  Future<void> speakAndWait(String text, {String boardId = 'default', String category = 'move'});
 }
 
 /// Production implementation spawning the Python speech pipeline subprocess.
@@ -94,10 +100,48 @@ class RealSpeechSynthesisService implements SpeechSynthesisService {
   }
 
   @override
+  Future<void> playAndWait(String path) async {
+    if (_isTesting) return;
+    try {
+      _initPlayer();
+      await _player?.stop();
+      
+      final completer = Completer<void>();
+      StreamSubscription? sub;
+      sub = _player?.onPlayerComplete.listen((event) {
+        sub?.cancel();
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
+      });
+
+      await _player?.play(DeviceFileSource(path));
+      
+      await completer.future.timeout(
+        const Duration(seconds: 8),
+        onTimeout: () {
+          sub?.cancel();
+          debugPrint('playAndWait timed out');
+        },
+      );
+    } catch (e) {
+      debugPrint('Playback error in playAndWait: $e');
+    }
+  }
+
+  @override
   Future<void> speak(String text, {String boardId = 'default', String category = 'move'}) async {
     final path = await generateSpeech(text, boardId: boardId, category: category);
     if (path != null) {
       await play(path);
+    }
+  }
+
+  @override
+  Future<void> speakAndWait(String text, {String boardId = 'default', String category = 'move'}) async {
+    final path = await generateSpeech(text, boardId: boardId, category: category);
+    if (path != null) {
+      await playAndWait(path);
     }
   }
 }
@@ -118,7 +162,18 @@ class MockSpeechSynthesisService implements SpeechSynthesisService {
   Future<void> play(String path) async {}
 
   @override
+  Future<void> playAndWait(String path) async {
+    await Future.delayed(const Duration(milliseconds: 100));
+  }
+
+  @override
   Future<void> speak(String text, {String boardId = 'default', String category = 'move'}) async {
     await generateSpeech(text, boardId: boardId, category: category);
+  }
+
+  @override
+  Future<void> speakAndWait(String text, {String boardId = 'default', String category = 'move'}) async {
+    await generateSpeech(text, boardId: boardId, category: category);
+    await playAndWait('mock_path.wav');
   }
 }

@@ -10,7 +10,7 @@ abstract class SpeechService {
   bool get isListening;
   Future<bool> initialize();
   Future<void> listen({
-    required Function(String text, double confidence) onResult,
+    required Function(String text, double confidence, bool isFinal) onResult,
     required VoidCallback onStatusChanged,
   });
   Future<void> stop();
@@ -46,7 +46,7 @@ class RealSpeechService implements SpeechService {
 
   @override
   Future<void> listen({
-    required Function(String text, double confidence) onResult,
+    required Function(String text, double confidence, bool isFinal) onResult,
     required VoidCallback onStatusChanged,
   }) async {
     if (!_isInitialized) {
@@ -57,7 +57,7 @@ class RealSpeechService implements SpeechService {
     try {
       await _speech!.listen(
         onResult: (result) {
-          onResult(result.recognizedWords, result.confidence);
+          onResult(result.recognizedWords, result.confidence, result.finalResult);
         },
         listenOptions: stt.SpeechListenOptions(
           listenMode: stt.ListenMode.confirmation,
@@ -86,7 +86,7 @@ class RealSpeechService implements SpeechService {
 /// Simulated mock implementation used exclusively in automated widget/unit tests.
 class MockSpeechService implements SpeechService {
   bool _isListening = false;
-  Function(String text, double confidence)? currentResultCallback;
+  Function(String text, double confidence, bool isFinal)? currentResultCallback;
   VoidCallback? currentStatusCallback;
 
   @override
@@ -99,7 +99,7 @@ class MockSpeechService implements SpeechService {
 
   @override
   Future<void> listen({
-    required Function(String text, double confidence) onResult,
+    required Function(String text, double confidence, bool isFinal) onResult,
     required VoidCallback onStatusChanged,
   }) async {
     _isListening = true;
@@ -114,7 +114,7 @@ class MockSpeechService implements SpeechService {
     currentStatusCallback?.call();
   }
 
-  void simulateSpeech(String text, {double confidence = 1.0}) {
-    currentResultCallback?.call(text, confidence);
+  void simulateSpeech(String text, {double confidence = 1.0, bool isFinal = true}) {
+    currentResultCallback?.call(text, confidence, isFinal);
   }
 }

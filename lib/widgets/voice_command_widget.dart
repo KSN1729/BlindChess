@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../services/speech_service.dart';
+import '../services/voice_pipeline_service.dart';
 
 /// Reusable premium control providing speech-to-text input with custom pulsing glow indicator.
 class VoiceCommandWidget extends StatefulWidget {
@@ -22,7 +22,8 @@ class _VoiceCommandWidgetState extends State<VoiceCommandWidget>
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   String _recognizedText = '';
-  Timer? _clearTextTimer;
+  StreamSubscription<VoiceState>? _stateSubscription;
+  StreamSubscription<String>? _textSubscription;
 
   @override
   void initState() {
@@ -34,87 +35,65 @@ class _VoiceCommandWidgetState extends State<VoiceCommandWidget>
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.35).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+
+    // Sync pulse animation with voice pipeline state transitions
+    _stateSubscription = VoicePipelineService.instance.onStateChanged.listen((state) {
+      if (mounted) {
+        setState(() {
+          final isListening = state == VoiceState.listening || state == VoiceState.undoWindow;
+          if (isListening) {
+            _pulseController.repeat(reverse: true);
+          } else {
+            _pulseController.stop();
+          }
+        });
+      }
+    });
+
+    // Sync real-time recognized text preview
+    _textSubscription = VoicePipelineService.instance.onRecognizedTextChanged.listen((text) {
+      if (mounted) {
+        setState(() {
+          _recognizedText = text;
+        });
+      }
+    });
+
+    final isListening = VoicePipelineService.instance.state == VoiceState.listening ||
+        VoicePipelineService.instance.state == VoiceState.undoWindow;
+    if (isListening) {
+      _pulseController.repeat(reverse: true);
+    }
   }
 
   @override
   void dispose() {
+    _stateSubscription?.cancel();
+    _textSubscription?.cancel();
     _pulseController.dispose();
-    _clearTextTimer?.cancel();
     super.dispose();
   }
 
   Future<void> _toggleListening() async {
     if (!widget.isEnabled) return;
-
-    final speechService = SpeechService.instance;
-    if (speechService.isListening) {
-      _pulseController.stop();
-      await speechService.stop();
-      setState(() {});
-    } else {
-      _clearTextTimer?.cancel();
-      final initialized = await speechService.initialize();
-      if (!initialized) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Speech recognition not available or permission denied.',
-              ),
-            ),
-          );
-        }
-        return;
-      }
-
-      _pulseController.repeat(reverse: true);
-      setState(() {
-        _recognizedText = '';
-      });
-
-      await speechService.listen(
-        onResult: (text, confidence) {
-          if (mounted) {
-            setState(() {
-              _recognizedText = text;
-            });
-            _resetClearTextTimer();
-            if (text.trim().isNotEmpty) {
-              widget.onCommand(text, sttConfidence: confidence);
-            }
-          }
-        },
-        onStatusChanged: () {
-          if (mounted) {
-            setState(() {
-              if (!speechService.isListening) {
-                _pulseController.stop();
-              }
-            });
-          }
-        },
-      );
-      setState(() {});
-    }
-  }
-
-  void _resetClearTextTimer() {
-    _clearTextTimer?.cancel();
-    _clearTextTimer = Timer(const Duration(seconds: 4), () {
-      if (mounted) {
-        setState(() {
-          _recognizedText = '';
-        });
-      }
-    });
+    await VoicePipelineService.instance.toggleListening();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final speechService = SpeechService.instance;
-    final isListening = speechService.isListening;
+    final pipeline = VoicePipelineService.instance;
+    final isListening = pipeline.state == VoiceState.listening || pipeline.state == VoiceState.undoWindow;
+
+    String instructionText = 'Tap microphone and speak move (e.g. "e2 to e4", "knight f3")';
+    if (pipeline.state == VoiceState.processing) {
+      instructionText = 'Processing command...';
+    } else if (pipeline.state == VoiceState.speakingFeedback) {
+      instructionText = 'Speaking...';
+    } else if (!widget.isEnabled) {
+      instructionText = 'Voice command disabled during opponent turn';
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -165,11 +144,9 @@ class _VoiceCommandWidgetState extends State<VoiceCommandWidget>
                     child: Text(
                       _recognizedText.isNotEmpty
                           ? '"$_recognizedText"'
-                          : (widget.isEnabled
-                                ? 'Tap microphone and speak move (e.g. "e2 to e4", "knight f3")'
-                                : 'Voice command disabled during opponent turn'),
+                          : instructionText,
                       key: ValueKey(
-                        _recognizedText.isEmpty ? 'placeholder' : 'recognized',
+                        _recognizedText.isEmpty ? instructionText : 'recognized',
                       ),
                       style: TextStyle(
                         fontSize: 13,
