@@ -60,12 +60,12 @@ class ChessBoard extends StatelessWidget {
     }
 
     // Blend last-move highlights (subtle yellow tint)
-    if (isLastMove) {
+    if (isLastMove && SettingsService.instance.showLastMoveHighlight) {
       baseColor = Color.lerp(baseColor, Colors.yellow, 0.15) ?? baseColor;
     }
 
     // Blend legal-move highlights (green tint)
-    if (isHighlighted) {
+    if (isHighlighted && SettingsService.instance.showLegalHints) {
       baseColor = Color.lerp(baseColor, Colors.green, 0.3) ?? baseColor;
     }
 
@@ -97,18 +97,19 @@ class ChessBoard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final files = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    final effectivePerspective = isWhitePerspective ^ SettingsService.instance.flipBoard;
 
     return AspectRatio(
       aspectRatio: 1.0,
       child: Column(
         children: List.generate(8, (rankIndex) {
-          final actualRowIndex = isWhitePerspective ? rankIndex : 7 - rankIndex;
+          final actualRowIndex = effectivePerspective ? rankIndex : 7 - rankIndex;
           final rank = 8 - actualRowIndex;
 
           return Expanded(
             child: Row(
               children: List.generate(8, (fileIndex) {
-                final actualColIndex = isWhitePerspective
+                final actualColIndex = effectivePerspective
                     ? fileIndex
                     : 7 - fileIndex;
                 final file = files[actualColIndex];
@@ -126,7 +127,7 @@ class ChessBoard extends StatelessWidget {
                     (lastMoveEnd != null &&
                         lastMoveEnd == (actualRowIndex, actualColIndex));
                 final squareColor = getSquareColor(
-                  rankIndex,
+                   rankIndex,
                   fileIndex,
                   isHighlighted,
                   isLastMove,

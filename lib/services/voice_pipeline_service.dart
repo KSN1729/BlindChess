@@ -1,10 +1,11 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'speech_service.dart';
-import 'speech_synthesis_service.dart';
+import 'tts_service.dart';
+import 'accessibility_settings_service.dart';
+import '../models/chess_piece.dart';
+import '../utils/chess_speech_synthesizer.dart';
 import '../utils/voice_command_parser.dart';
-import '../utils/tts/tts_base.dart' as tts;
 
 enum VoiceState {
   idle,
@@ -24,11 +25,34 @@ abstract class VoicePipelineDelegate {
   void onMoveSuccess(Map<String, dynamic> move, String confirmationText);
   void onError(String message);
   void onUndoSuccess();
+  void onResign();
+  void onDrawOffer();
+  void onRepeatAnnouncement();
+  void onHelp();
+  void onNewGame();
+  void onRestartGame();
 }
 
 class VoicePipelineService {
   static final VoicePipelineService instance = VoicePipelineService._internal();
-  VoicePipelineService._internal();
+  VoicePipelineService._internal() {
+    _initTtsListeners();
+  }
+
+  void _initTtsListeners() {
+    TtsService.instance.registerSpeechStatusListener(
+      onStart: () async {
+        debugPrint('[VoicePipeline] TTS active: pausing speech recognition');
+        await _stopListeningInternal();
+      },
+      onEnd: () async {
+        debugPrint('[VoicePipeline] TTS finished: resuming speech recognition if applicable');
+        if (_shouldBeListening && !_isProcessing && _state != VoiceState.speakingFeedback) {
+          await _startListeningInternal();
+        }
+      },
+    );
+  }
 
   VoiceState _state = VoiceState.idle;
   VoiceState get state => _state;
@@ -56,6 +80,7 @@ class VoicePipelineService {
 
   // Active listening session variables
   bool _shouldBeListening = false;
+  String? _lastFeedbackText;
 
   bool get _isTesting =>
       WidgetsBinding.instance.toString().contains('TestWidgetsFlutterBinding');
@@ -374,6 +399,11 @@ class VoicePipelineService {
       debugPrint('[VoicePipeline] Stage "parsing and matching" took ${stopwatchParser.elapsedMilliseconds}ms');
 
       if (matchedMove != null) {
+        if (matchedMove.containsKey('action')) {
+          final action = matchedMove['action'] as String;
+          await _executeGameCommand(action);
+          return;
+        }
         if (matchedMove.containsKey('error')) {
           final errorMsg = matchedMove['error'] as String;
           if (matchedMove.containsKey('clarificationMove')) {
@@ -410,26 +440,25 @@ class VoicePipelineService {
 
         if (success) {
           _lastMoveTime = DateTime.now();
-          final pMap = {
-            'n': 'Knight',
-            'r': 'Rook',
-            'q': 'Queen',
-            'b': 'Bishop',
-            'k': 'King',
-            'p': 'Pawn',
-          };
-          final pieceName = pMap[matchedMove['piece']] ?? 'Pawn';
-          final String confirmationText;
+          
+          final settings = AccessibilitySettingsService.instance;
           final san = matchedMove['san'] as String? ?? '';
-          if (san.startsWith('O-O-O')) {
-            confirmationText = 'Castles queenside';
-          } else if (san.startsWith('O-O')) {
-            confirmationText = 'Castles kingside';
-          } else if (pieceName == 'Pawn') {
-            confirmationText = toStr;
-          } else {
-            confirmationText = '$pieceName to $toStr';
-          }
+          final isCheck = san.endsWith('+');
+          final isCheckmate = san.endsWith('#');
+          
+          // Determine moverColor
+          final fen = delegate.getFen();
+          final isWhiteTurn = fen.contains(' w ');
+          final moverColor = isWhiteTurn ? PieceColor.black : PieceColor.white;
+          
+          final confirmationText = ChessSpeechSynthesizer.translateMove(
+            move: matchedMove,
+            verbosity: settings.verbosity,
+            moverColor: moverColor,
+            isCheck: isCheck,
+            isCheckmate: isCheckmate,
+            isStalemate: false,
+          );
 
           delegate.onMoveSuccess(matchedMove, confirmationText);
           await _speakFeedback(confirmationText);
@@ -495,33 +524,70 @@ class VoicePipelineService {
     });
   }
 
+  Future<void> _executeGameCommand(String action) async {
+    final delegate = _delegate;
+    if (delegate == null) {
+      transitionTo(VoiceState.idle);
+      return;
+    }
+
+    switch (action) {
+      case 'resign':
+        delegate.onResign();
+        await _speakFeedback('Resigning the game.');
+        break;
+      case 'draw':
+        delegate.onDrawOffer();
+        await _speakFeedback('Offering a draw.');
+        break;
+      case 'repeat':
+        delegate.onRepeatAnnouncement();
+        if (_lastFeedbackText != null) {
+          final oldFeedback = _lastFeedbackText;
+          await _speakFeedback(oldFeedback!);
+          _lastFeedbackText = oldFeedback;
+        } else {
+          await _speakFeedback('No previous announcement to repeat.');
+        }
+        break;
+      case 'help':
+        delegate.onHelp();
+        await _speakFeedback('Help menu. You can say your move, for example e2 to e4, castle, undo, resign, or draw.');
+        break;
+      case 'new_game':
+        delegate.onNewGame();
+        await _speakFeedback('Starting a new game.');
+        break;
+      case 'restart':
+        delegate.onRestartGame();
+        await _speakFeedback('Restarting the game.');
+        break;
+    }
+
+    _recognizedText = '';
+    _recognizedTextController.add('');
+    
+    // Resume listening if continuous listening is enabled and the action doesn't end the game screen/session
+    if (_shouldBeListening && action != 'resign' && action != 'new_game' && action != 'restart') {
+      transitionTo(VoiceState.listening);
+      scheduleMicrotask(() async {
+        await _startListeningInternal();
+      });
+    } else {
+      transitionTo(VoiceState.idle);
+    }
+  }
+
   Future<void> _speakFeedback(String text) async {
+    _lastFeedbackText = text;
     transitionTo(VoiceState.speakingFeedback);
     debugPrint('[VoicePipeline] TTS Start: "$text"');
     
     // Ensure microphone is stopped during speaking
     await _stopListeningInternal();
 
-    if (_isTesting) {
-      if (kIsWeb) {
-        tts.speak(text);
-      } else {
-        SpeechSynthesisService.instance.speak(text);
-      }
-      debugPrint('[VoicePipeline] TTS End (Test): "$text"');
-      return;
-    }
-
     final startTime = DateTime.now();
-
-    if (kIsWeb) {
-      tts.speak(text);
-      final wordCount = text.split(RegExp(r'\s+')).length;
-      final duration = Duration(milliseconds: (wordCount * 300) + 500);
-      await Future.delayed(duration);
-    } else {
-      await SpeechSynthesisService.instance.speakAndWait(text);
-    }
+    await TtsService.instance.speak(text, priority: AnnouncementPriority.high);
 
     debugPrint('[VoicePipeline] TTS End: "$text" (took ${DateTime.now().difference(startTime).inMilliseconds}ms)');
   }

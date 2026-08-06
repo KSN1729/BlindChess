@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:blind_chess/services/lichess_service.dart';
+import 'package:blind_chess/services/lichess_auth_service.dart';
 import 'package:url_launcher_platform_interface/url_launcher_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:fake_async/fake_async.dart';
@@ -103,14 +104,20 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('LichessService PKCE and Auth Tests', () {
-    setUp(() {
-      SharedPreferences.setMockInitialValues({});
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({
+        'lichess_access_token': 'mock_token',
+        'lichess_username': 'MockLichessUser',
+      });
       SettingsService.instance.resetToDefaults();
+      LichessService.instance.resetForTesting();
+      await LichessService.instance.init();
       // Restore default clientFactory
       LichessService.instance.clientFactory = () => HttpClient();
     });
 
     test('LichessService initialization with no saved credentials', () async {
+      await LichessService.instance.logout();
       final service = LichessService.instance;
       await service.init();
       expect(service.isAuthenticated, isFalse);
@@ -119,6 +126,7 @@ void main() {
     });
 
     test('LichessService initialization with cached credentials', () async {
+      await LichessService.instance.logout();
       SharedPreferences.setMockInitialValues({
         'lichess_access_token': 'test_token_123',
         'lichess_username': 'LichessUser',
@@ -452,6 +460,7 @@ void main() {
     test(
       'LichessService login initiates OAuth with correct redirect URI',
       () async {
+        await LichessService.instance.logout();
         final mockLauncher = MockUrlLauncher();
         UrlLauncherPlatform.instance = mockLauncher;
 
@@ -469,7 +478,8 @@ void main() {
       },
     );
 
-    test('LichessService login timeout resets state', () {
+    test('LichessService login timeout resets state', () async {
+      await LichessService.instance.logout();
       fakeAsync((async) {
         final mockLauncher = MockUrlLauncher();
         UrlLauncherPlatform.instance = mockLauncher;
@@ -491,6 +501,7 @@ void main() {
     test(
       'LichessService handleIncomingUri handles access_denied error',
       () async {
+        await LichessService.instance.logout();
         final service = LichessService.instance;
         service.isAuthenticatingNotifier.value = true;
         service.errorMessageNotifier.value = null;
@@ -508,6 +519,7 @@ void main() {
     test(
       'LichessService handleIncomingUri ignores duplicate calls when authenticating',
       () async {
+        await LichessService.instance.logout();
         final service = LichessService.instance;
         service.isAuthenticatingNotifier.value = true;
         service.errorMessageNotifier.value = null;
@@ -527,6 +539,7 @@ void main() {
         service.clientFactory = () => mockClient;
 
         // Initiate call without awaiting so we can test parallel/duplicate call
+        LichessAuthService.testDelayCompleter = Completer<void>();
         final firstFuture = service.handleIncomingUri(successUri);
 
         // Second call happens immediately while exchange is active
@@ -536,7 +549,9 @@ void main() {
         expect(service.isAuthenticatingNotifier.value, isTrue);
         expect(service.errorMessageNotifier.value, isNull);
 
+        LichessAuthService.testDelayCompleter!.complete();
         await firstFuture;
+        LichessAuthService.testDelayCompleter = null;
       },
     );
 

@@ -43,7 +43,9 @@ dependencies:
   crypto: ^3.0.3
   app_links: ^6.1.1
   speech_to_text: ^7.3.0
+  flutter_tts: ^4.2.5
   web: ^1.1.1
+  flutter_secure_storage: ^10.3.1
 #  tflite_flutter: ^0.10.4
 
 dev_dependencies:

@@ -1791,6 +1791,48 @@ class LegalMoveMatcher {
 
 /// Thin coordination class that maps spoken text to a legal move map.
 class VoiceCommandParser {
+  static String? _matchGameCommand(String normalized) {
+    final clean = normalized.toLowerCase().trim();
+    
+    // Resign
+    final resignKeywords = ['resign', 'quit game', 'give up', 'forfeit'];
+    if (resignKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'resign';
+    }
+
+    // Draw
+    final drawKeywords = ['draw', 'offer draw', 'request draw', 'accept draw'];
+    if (drawKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'draw';
+    }
+
+    // Repeat
+    final repeatKeywords = ['repeat', 'repeat last', 'say again', 'repeat announcement'];
+    if (repeatKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'repeat';
+    }
+
+    // Help
+    final helpKeywords = ['help', 'what can i say', 'voice help', 'command list'];
+    if (helpKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'help';
+    }
+
+    // New Game
+    final newGameKeywords = ['new game', 'start new game', 'play again'];
+    if (newGameKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'new_game';
+    }
+
+    // Restart
+    final restartKeywords = ['restart', 'restart game', 'reset game'];
+    if (restartKeywords.any((p) => clean == p || clean.contains(p))) {
+      return 'restart';
+    }
+
+    return null;
+  }
+
   static String? classifyFailure(
     Map<String, dynamic>? result,
     String rawText,
@@ -1924,6 +1966,14 @@ class VoiceCommandParser {
       final normStopwatch = Stopwatch()..start();
       final normalized = TextNormalizer.normalize(text);
       normStopwatch.stop();
+
+      // Check for custom game command first
+      final action = _matchGameCommand(normalized);
+      if (action != null) {
+        totalStopwatch.stop();
+        return {'action': action};
+      }
+
 
       final phoneticStopwatch = Stopwatch()..start();
       final tokens = normalized.split(RegExp(r'\s+'));

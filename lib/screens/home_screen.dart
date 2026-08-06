@@ -3,9 +3,11 @@ import '../widgets/section_title.dart';
 import 'game_screen.dart';
 import 'stats_screen.dart';
 import '../services/lichess_service.dart';
+import '../models/lichess_connection_state.dart';
 import 'recent_games_screen.dart';
 import '../widgets/challenge_bot_dialog.dart';
 import 'speech_test_screen.dart';
+import 'accessibility_settings_screen.dart';
 
 /// [Why widgets are separated]
 /// Separating widgets into different files decomposes large, monolith files into small, single-purpose
@@ -34,6 +36,16 @@ class HomeScreen extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: const Text('BlindChess'),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.accessibility),
+              tooltip: 'Accessibility Settings',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AccessibilitySettingsScreen()),
+                );
+              },
+            ),
             IconButton(
               icon: const Icon(Icons.record_voice_over),
               tooltip: 'Speech Test',
@@ -140,6 +152,7 @@ class HomeScreen extends StatelessWidget {
       listenable: Listenable.merge([
         lichess.isAuthenticatedNotifier,
         lichess.isAuthenticatingNotifier,
+        lichess.sessionManager.connectionStateNotifier,
         lichess.usernameNotifier,
         lichess.blitzRatingNotifier,
         lichess.rapidRatingNotifier,
@@ -308,6 +321,46 @@ class HomeScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
                       vertical: 8,
+                    ),
+                  ),
+                ),
+              ] else if (lichess.sessionManager.connectionState == LichessConnectionState.networkUnavailable) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.cloud_off,
+                      color: Colors.orange,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    const Expanded(
+                      child: Text(
+                        'Network unavailable. Please check your connection.',
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => lichess.loadProfile(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry Connection'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                 ),

@@ -87,7 +87,7 @@ class _ChallengeBotDialogState extends State<ChallengeBotDialog> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString().replaceAll('Exception: ', '')),
+            content: Text('Failed to challenge AI: ${LichessService.formatError(e)}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),

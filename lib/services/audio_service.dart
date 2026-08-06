@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'settings_service.dart';
+import 'accessibility_settings_service.dart';
 
 /// Service in charge of playing standard match sound effects.
 class AudioService {
@@ -20,17 +21,12 @@ class AudioService {
   }
 
   /// Plays an audio asset.
-  ///
-  /// [Offline-First Architecture & App Store Reliability]
-  /// Bundling audio files locally (e.g. under assets/sounds/) ensures that the application operates
-  /// 100% offline without any runtime dependencies on external URLs/CDN servers. This eliminates
-  /// risk of sudden silence if third-party audio hosting goes down, reduces initial latency,
-  /// and aligns with App Store requirements for robust offline execution.
   Future<void> _playSound(String assetPath) async {
     if (_isTesting) {
       return; // Completely skip audio playback during widget tests
     }
     if (SettingsService.instance.isMuted) return; // Skip if muted
+    if (!AccessibilitySettingsService.instance.audioFeedbackEnabled) return; // Skip if audio feedback is disabled
 
     try {
       _initPlayer();
@@ -51,13 +47,28 @@ class AudioService {
     await _playSound('sounds/capture.wav');
   }
 
-  /// Plays sound effect for check or game over alert.
+  /// Plays sound effect for check.
   Future<void> playCheck() async {
     await _playSound('sounds/check.wav');
   }
 
-  /// Plays sound effect for an incorrect selection guess.
+  /// Plays sound effect for an incorrect selection guess / illegal move.
   Future<void> playIncorrectGuess() async {
     await _playSound('sounds/incorrect_guess.wav');
+  }
+
+  /// Plays sound effect for pawn promotion.
+  Future<void> playPromotion() async {
+    await _playSound('sounds/check.wav');
+  }
+
+  /// Plays sound effect for a game over event.
+  Future<void> playGameOver() async {
+    await _playSound('sounds/check.wav');
+  }
+
+  /// Plays sound effect for an illegal move.
+  Future<void> playIllegalMove() async {
+    await playIncorrectGuess();
   }
 }

@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/chess_piece.dart';
 import '../services/chess_engine_service.dart';
 import '../services/lichess_service.dart';
+import '../services/chess_clock_service.dart';
+import '../models/lichess_connection_state.dart';
+import '../models/chess_clock_config.dart';
+import '../services/lichess_api_client.dart';
 import '../services/audio_service.dart';
 import '../services/settings_service.dart';
 import '../services/statistics_service.dart';
@@ -10,6 +14,10 @@ import '../services/diagnostic_recorder.dart';
 import '../widgets/chess_board.dart';
 import '../widgets/voice_command_widget.dart';
 import '../services/voice_pipeline_service.dart';
+import '../services/accessibility_settings_service.dart';
+import '../services/tts_service.dart';
+import '../services/haptic_service.dart';
+import '../utils/chess_speech_synthesizer.dart';
 
 class LiveGameScreen extends StatefulWidget {
   final String gameId;
@@ -48,15 +56,73 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
   // Selection & sending states for player moves
   bool _isSendingMove = false;
+  bool _isVoiceMoveExecuted = false;
   List<(int, int)> _highlightedSquares = const [];
   String? _selectedSquare;
   int? _selectedRow;
   int? _selectedCol;
 
+  void _announceMoveAndState(Map<String, dynamic> move, {bool isVoice = false}) {
+    final flags = move['flags'] as String? ?? '';
+    final isCapture = flags.contains('c') || flags.contains('e');
+    final isPromotion = move['promotion'] != null;
+    final isCheck = _chessEngineService.inCheck;
+    final isCheckmate = _chessEngineService.inCheckmate;
+    final isStalemate = _chessEngineService.inStalemate;
+    final isDraw = _chessEngineService.inDraw;
+
+    // 1. Play sound feedback
+    final isGameOverStatus = isCheckmate || isStalemate || isDraw;
+    if (isGameOverStatus) {
+      AudioService.instance.playGameOver();
+    } else if (isCheck) {
+      AudioService.instance.playCheck();
+    } else if (isPromotion) {
+      AudioService.instance.playPromotion();
+    } else if (isCapture) {
+      AudioService.instance.playCapture();
+    } else {
+      AudioService.instance.playMove();
+    }
+
+    // 2. Play haptic feedback
+    if (isGameOverStatus) {
+      HapticService.triggerGameOver();
+    } else if (isCheck) {
+      HapticService.triggerCheck();
+    } else {
+      HapticService.triggerSuccessfulMove();
+    }
+
+    // 3. Spoken feedback
+    final settings = AccessibilitySettingsService.instance;
+    if (settings.speechEnabled && !isVoice) {
+      final moverColor = _chessEngineService.activeTurn == PieceColor.white 
+          ? PieceColor.black 
+          : PieceColor.white;
+      
+      var text = ChessSpeechSynthesizer.translateMove(
+        move: move,
+        verbosity: settings.verbosity,
+        moverColor: moverColor,
+        isCheck: isCheck,
+        isCheckmate: isCheckmate,
+        isStalemate: isStalemate,
+      );
+
+      if (!isCheckmate && !isStalemate && !isDraw) {
+        final nextTurnStr = _chessEngineService.activeTurn == PieceColor.white ? "White's turn." : "Black's turn.";
+        if (settings.verbosity == VerbosityLevel.detailed) {
+          text += '. $nextTurnStr';
+        }
+      }
+
+      TtsService.instance.speak(text, priority: AnnouncementPriority.normal);
+    }
+  }
+
   // Clock state variables
-  int _whiteTimeMs = 0;
-  int _blackTimeMs = 0;
-  Timer? _clockTimer;
+  late final ChessClockService _clockService;
 
   // Draw offer state
   bool _opponentDrawOffered = false;
@@ -87,7 +153,15 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       );
     }
     VoicePipelineService.instance.setDelegate(this);
+    _clockService = ChessClockService.instance;
+    _clockService.addListener(_onClockTick);
     _startStreaming();
+  }
+
+  void _onClockTick() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -113,7 +187,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       _connectionLost = false;
     });
 
-    _clockTimer?.cancel();
+    _clockService.stop();
     _streamSubscription?.cancel();
     _streamSubscription = LichessService.instance
         .streamGameState(widget.gameId)
@@ -123,7 +197,6 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
           onDone: _handleStreamDone,
           cancelOnError: true,
         );
-    _startClockTimer();
   }
 
   void _handleStreamEvent(Map<String, dynamic> event) {
@@ -148,11 +221,23 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       }
 
       final state = event['state'] ?? {};
-      if (state['wtime'] != null) {
-        _whiteTimeMs = state['wtime'] as int;
-      }
-      if (state['btime'] != null) {
-        _blackTimeMs = state['btime'] as int;
+      final wtime = state['wtime'] as int? ?? 0;
+      final btime = state['btime'] as int? ?? 0;
+      final hasClock = state['wtime'] != null;
+
+      _clockService.initialize(
+        config: ChessClockConfig(
+          label: 'Live Clock',
+          baseSeconds: 0,
+          incrementSeconds: 0,
+          hasTimer: hasClock,
+        ),
+        whiteTimeMs: wtime,
+        blackTimeMs: btime,
+        activeTurn: _chessEngineService.activeTurn,
+      );
+      if (hasClock) {
+        _clockService.start();
       }
 
       final wdraw = state['wdraw'] == true;
@@ -171,12 +256,10 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       final winner = state['winner'] as String?;
       _updateStatus(status, winner);
     } else if (type == 'gameState') {
-      if (event['wtime'] != null) {
-        _whiteTimeMs = event['wtime'] as int;
-      }
-      if (event['btime'] != null) {
-        _blackTimeMs = event['btime'] as int;
-      }
+      final wtime = event['wtime'] as int? ?? _clockService.whiteTimeMs;
+      final btime = event['btime'] as int? ?? _clockService.blackTimeMs;
+      _clockService.setRemainingTimes(wtime, btime);
+      _clockService.setActiveTurn(_chessEngineService.activeTurn);
 
       final wdraw = event['wdraw'] == true;
       final bdraw = event['bdraw'] == true;
@@ -206,18 +289,22 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     }
 
     final movesList = trimmed.split(' ');
-    bool lastMoveCaptured = false;
+    Map<String, dynamic>? executedMove;
     for (int i = 0; i < movesList.length; i++) {
       final uci = movesList[i];
       if (uci.length >= 4) {
         if (i == movesList.length - 1 &&
             oldMoveCount > 0 &&
             movesList.length > oldMoveCount) {
-          final toFile = uci[2];
-          final toRank = uci[3];
-          final toCol = toFile.codeUnitAt(0) - 'a'.codeUnitAt(0);
-          final toRow = 8 - int.parse(toRank);
-          lastMoveCaptured = _chessEngineService.pieceAt(toRow, toCol) != null;
+          final fromSq = uci.substring(0, 2);
+          final toSq = uci.substring(2, 4);
+          final legalMovesBefore = _chessEngineService.getLegalMoves();
+          for (final m in legalMovesBefore) {
+            if (m['from'] == fromSq && m['to'] == toSq) {
+              executedMove = m;
+              break;
+            }
+          }
         }
 
         final success = _chessEngineService.makeUciMove(uci);
@@ -242,13 +329,10 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     _updateCheckedKing();
 
     if (_moveCount > oldMoveCount && oldMoveCount > 0) {
-      if (_chessEngineService.inCheck || _chessEngineService.inCheckmate) {
-        AudioService.instance.playCheck();
-      } else if (lastMoveCaptured) {
-        AudioService.instance.playCapture();
-      } else {
-        AudioService.instance.playMove();
+      if (executedMove != null) {
+        _announceMoveAndState(executedMove, isVoice: _isVoiceMoveExecuted);
       }
+      _isVoiceMoveExecuted = false; // Reset voice flag
     }
 
     if (mounted) setState(() {});
@@ -328,10 +412,13 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
   void _handleStreamError(dynamic error) {
     if (!mounted) return;
+    if (error is LichessNetworkException) {
+      LichessService.instance.sessionManager.setConnectionState(LichessConnectionState.networkUnavailable);
+    }
     setState(() {
       _isLoading = false;
       _connectionLost = true;
-      _errorMessage = error.toString().replaceAll('Exception: ', '');
+      _errorMessage = LichessService.formatError(error);
     });
   }
 
@@ -343,29 +430,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     });
   }
 
-  void _startClockTimer() {
-    _clockTimer?.cancel();
-    _clockTimer = Timer.periodic(const Duration(milliseconds: 100), (timer) {
-      if (!mounted) return;
-      if (_isLoading || _connectionLost) return;
 
-      // Do not tick if game is over
-      if (_gameStatus.startsWith('Game Over') ||
-          _chessEngineService.inCheckmate ||
-          _chessEngineService.inStalemate) {
-        return;
-      }
-
-      final turn = _chessEngineService.activeTurn;
-      setState(() {
-        if (turn == PieceColor.white) {
-          _whiteTimeMs = (_whiteTimeMs - 100).clamp(0, 999999999).toInt();
-        } else {
-          _blackTimeMs = (_blackTimeMs - 100).clamp(0, 999999999).toInt();
-        }
-      });
-    });
-  }
 
   String _formatTime(int ms) {
     if (ms <= 0) return '00:00';
@@ -412,7 +477,8 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     WidgetsBinding.instance.removeObserver(this);
     VoicePipelineService.instance.setDelegate(null);
     VoicePipelineService.instance.stopPipeline();
-    _clockTimer?.cancel();
+    _clockService.removeListener(_onClockTick);
+    _clockService.stop();
     _streamSubscription?.cancel();
     _revealTimer?.cancel();
     super.dispose();
@@ -607,7 +673,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Failed to resign: ${err.toString().replaceAll('Exception: ', '')}',
+                'Failed to resign: ${LichessService.formatError(err)}',
               ),
               backgroundColor: Colors.red[800],
             ),
@@ -635,7 +701,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Failed to abort: ${err.toString().replaceAll('Exception: ', '')}',
+                'Failed to abort: ${LichessService.formatError(err)}',
               ),
               backgroundColor: Colors.red[800],
             ),
@@ -666,7 +732,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Draw action failed: ${err.toString().replaceAll('Exception: ', '')}',
+                'Draw action failed: ${LichessService.formatError(err)}',
               ),
               backgroundColor: Colors.red[800],
             ),
@@ -833,7 +899,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Move rejected: ${err.toString().replaceAll('Exception: ', '')}',
+                'Move rejected: ${LichessService.formatError(err)}',
               ),
               backgroundColor: Colors.red[800],
             ),
@@ -865,11 +931,11 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     final playerIsActiveTurn = !isGameOver && (turn == _playerColor);
 
     final opponentTimeMs = _playerColor == PieceColor.white
-        ? _blackTimeMs
-        : _whiteTimeMs;
+        ? _clockService.blackTimeMs
+        : _clockService.whiteTimeMs;
     final playerTimeMs = _playerColor == PieceColor.white
-        ? _whiteTimeMs
-        : _blackTimeMs;
+        ? _clockService.whiteTimeMs
+        : _clockService.blackTimeMs;
 
     final opponentLowTime = opponentTimeMs < 30000;
     final playerLowTime = playerTimeMs < 30000;
@@ -1586,6 +1652,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
   @override
   void onMoveSuccess(Map<String, dynamic> move, String confirmationText) {
+    _isVoiceMoveExecuted = true;
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -1597,11 +1664,74 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
   @override
   void onError(String message) {
+    AudioService.instance.playIllegalMove();
+    HapticService.triggerIllegalMove();
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  void onResign() {
+    _executeResign();
+  }
+
+  @override
+  void onDrawOffer() {
+    _handleDraw(true);
+  }
+
+  @override
+  void onRepeatAnnouncement() {
+    // No-op, handled directly by the pipeline TTS replay
+  }
+
+  @override
+  void onHelp() {
+    _showVoiceHelpDialog();
+  }
+
+  @override
+  void onNewGame() {
+    Navigator.of(context).pop();
+  }
+
+  @override
+  void onRestartGame() {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Cannot restart a live Lichess game.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showVoiceHelpDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Voice Commands Help'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('You can speak the following commands:'),
+            SizedBox(height: 8),
+            Text('• Moves: "e2 to e4", "knight f3", "castle kingside", "promote to queen"'),
+            Text('• Game Actions: "undo", "resign", "draw", "repeat", "help", "new game", "restart"'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }

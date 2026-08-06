@@ -152,7 +152,7 @@ class ChessSquare extends StatelessWidget {
                     // Otherwise, stack the piece SVG graphic above the coordinate label vertically.
                     child: piece == null
                         ? Text(
-                            label,
+                            SettingsService.instance.showCoordinates ? label : '',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: fontSize,
@@ -179,17 +179,19 @@ class ChessSquare extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              SizedBox(height: squareSize * 0.02),
-                              Text(
-                                label,
-                                style: TextStyle(
-                                  fontSize: labelFontSize,
-                                  fontWeight: FontWeight.bold,
-                                  color: squareColor == Colors.white
-                                      ? Colors.black.withValues(alpha: 0.6)
-                                      : Colors.white.withValues(alpha: 0.6),
+                              if (SettingsService.instance.showCoordinates) ...[
+                                SizedBox(height: squareSize * 0.02),
+                                Text(
+                                  label,
+                                  style: TextStyle(
+                                    fontSize: labelFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: squareColor == Colors.white
+                                        ? Colors.black.withValues(alpha: 0.6)
+                                        : Colors.white.withValues(alpha: 0.6),
+                                  ),
                                 ),
-                              ),
+                              ],
                             ],
                           ),
                   ),

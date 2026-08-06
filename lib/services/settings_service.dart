@@ -32,6 +32,13 @@ class SettingsService {
   static const String _keyBlindfoldDifficulty = 'settings_blindfold_difficulty';
   static const String _keyIsVoiceDebugMode = 'settings_is_voice_debug_mode';
 
+  // Board preferences keys
+  static const String _keyFlipBoard = 'settings_board_flip_board';
+  static const String _keyAutoRotate = 'settings_board_auto_rotate';
+  static const String _keyShowCoordinates = 'settings_board_show_coordinates';
+  static const String _keyShowLegalHints = 'settings_board_show_legal_hints';
+  static const String _keyShowLastMoveHighlight = 'settings_board_show_last_move_highlight';
+
   // State notifier to trigger theme/settings rebuilds across the app
   final ValueNotifier<bool> isDarkModeNotifier = ValueNotifier<bool>(false);
   final ValueNotifier<String> boardThemeNotifier = ValueNotifier<String>(
@@ -49,6 +56,13 @@ class SettingsService {
     kDebugMode,
   );
 
+  // Board preference notifiers
+  final ValueNotifier<bool> flipBoardNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> autoRotateNotifier = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> showCoordinatesNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> showLegalHintsNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> showLastMoveHighlightNotifier = ValueNotifier<bool>(true);
+
   bool get isDarkMode => isDarkModeNotifier.value;
   String get boardTheme => boardThemeNotifier.value;
   bool get isMuted => isMutedNotifier.value;
@@ -57,6 +71,13 @@ class SettingsService {
   BlindfoldDifficulty get blindfoldDifficulty =>
       blindfoldDifficultyNotifier.value;
   bool get isVoiceDebugMode => isVoiceDebugModeNotifier.value;
+
+  // Board preference getters
+  bool get flipBoard => flipBoardNotifier.value;
+  bool get autoRotate => autoRotateNotifier.value;
+  bool get showCoordinates => showCoordinatesNotifier.value;
+  bool get showLegalHints => showLegalHintsNotifier.value;
+  bool get showLastMoveHighlight => showLastMoveHighlightNotifier.value;
 
   /// Loads all settings from local SharedPreferences storage.
   Future<void> loadSettings() async {
@@ -74,6 +95,13 @@ class SettingsService {
       (e) => e.name == diffStr,
       orElse: () => BlindfoldDifficulty.medium,
     );
+
+    // Load board preferences
+    flipBoardNotifier.value = prefs.getBool(_keyFlipBoard) ?? false;
+    autoRotateNotifier.value = prefs.getBool(_keyAutoRotate) ?? false;
+    showCoordinatesNotifier.value = prefs.getBool(_keyShowCoordinates) ?? true;
+    showLegalHintsNotifier.value = prefs.getBool(_keyShowLegalHints) ?? true;
+    showLastMoveHighlightNotifier.value = prefs.getBool(_keyShowLastMoveHighlight) ?? true;
   }
 
   /// Toggles Dark Mode setting and commits to local storage.
@@ -118,6 +146,41 @@ class SettingsService {
     await prefs.setBool(_keyIsVoiceDebugMode, value);
   }
 
+  /// Sets Flip Board preference.
+  Future<void> setFlipBoard(bool value) async {
+    flipBoardNotifier.value = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyFlipBoard, value);
+  }
+
+  /// Sets Auto Rotate preference.
+  Future<void> setAutoRotate(bool value) async {
+    autoRotateNotifier.value = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyAutoRotate, value);
+  }
+
+  /// Sets Coordinates ON/OFF preference.
+  Future<void> setShowCoordinates(bool value) async {
+    showCoordinatesNotifier.value = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyShowCoordinates, value);
+  }
+
+  /// Sets Legal Move Hints ON/OFF preference.
+  Future<void> setShowLegalHints(bool value) async {
+    showLegalHintsNotifier.value = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyShowLegalHints, value);
+  }
+
+  /// Sets Last Move Highlight preference.
+  Future<void> setShowLastMoveHighlight(bool value) async {
+    showLastMoveHighlightNotifier.value = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_keyShowLastMoveHighlight, value);
+  }
+
   /// Resets settings to default values for test isolation.
   void resetToDefaults() {
     isDarkModeNotifier.value = false;
@@ -126,5 +189,11 @@ class SettingsService {
     isBlindfoldModeNotifier.value = false;
     blindfoldDifficultyNotifier.value = BlindfoldDifficulty.medium;
     isVoiceDebugModeNotifier.value = kDebugMode;
+
+    flipBoardNotifier.value = false;
+    autoRotateNotifier.value = false;
+    showCoordinatesNotifier.value = true;
+    showLegalHintsNotifier.value = true;
+    showLastMoveHighlightNotifier.value = true;
   }
 }

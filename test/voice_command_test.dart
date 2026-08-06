@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:blind_chess/services/voice_regression_service.dart';
+import 'package:blind_chess/services/voice_pipeline_service.dart';
 import 'package:blind_chess/services/speech_service.dart';
 import 'package:blind_chess/services/settings_service.dart';
 import 'package:blind_chess/utils/voice_command_parser.dart';
@@ -90,6 +91,45 @@ void main() {
         VoiceCommandParser.parseCommand('long castle', legalMoves),
         equals(legalMoves[1]),
       );
+    });
+
+    test('game commands recognition', () {
+      final legalMoves = <Map<String, dynamic>>[];
+      
+      // Resign
+      expect(VoiceCommandParser.parseCommand('resign', legalMoves), equals({'action': 'resign'}));
+      expect(VoiceCommandParser.parseCommand('I resign', legalMoves), equals({'action': 'resign'}));
+      expect(VoiceCommandParser.parseCommand('quit game', legalMoves), equals({'action': 'resign'}));
+      expect(VoiceCommandParser.parseCommand('give up', legalMoves), equals({'action': 'resign'}));
+      expect(VoiceCommandParser.parseCommand('forfeit', legalMoves), equals({'action': 'resign'}));
+
+      // Draw
+      expect(VoiceCommandParser.parseCommand('draw', legalMoves), equals({'action': 'draw'}));
+      expect(VoiceCommandParser.parseCommand('offer draw', legalMoves), equals({'action': 'draw'}));
+      expect(VoiceCommandParser.parseCommand('request draw', legalMoves), equals({'action': 'draw'}));
+      expect(VoiceCommandParser.parseCommand('accept draw', legalMoves), equals({'action': 'draw'}));
+
+      // Repeat
+      expect(VoiceCommandParser.parseCommand('repeat', legalMoves), equals({'action': 'repeat'}));
+      expect(VoiceCommandParser.parseCommand('repeat last', legalMoves), equals({'action': 'repeat'}));
+      expect(VoiceCommandParser.parseCommand('say again', legalMoves), equals({'action': 'repeat'}));
+      expect(VoiceCommandParser.parseCommand('repeat announcement', legalMoves), equals({'action': 'repeat'}));
+
+      // Help
+      expect(VoiceCommandParser.parseCommand('help', legalMoves), equals({'action': 'help'}));
+      expect(VoiceCommandParser.parseCommand('what can I say', legalMoves), equals({'action': 'help'}));
+      expect(VoiceCommandParser.parseCommand('voice help', legalMoves), equals({'action': 'help'}));
+      expect(VoiceCommandParser.parseCommand('command list', legalMoves), equals({'action': 'help'}));
+
+      // New Game
+      expect(VoiceCommandParser.parseCommand('new game', legalMoves), equals({'action': 'new_game'}));
+      expect(VoiceCommandParser.parseCommand('start new game', legalMoves), equals({'action': 'new_game'}));
+      expect(VoiceCommandParser.parseCommand('play again', legalMoves), equals({'action': 'new_game'}));
+
+      // Restart
+      expect(VoiceCommandParser.parseCommand('restart', legalMoves), equals({'action': 'restart'}));
+      expect(VoiceCommandParser.parseCommand('restart game', legalMoves), equals({'action': 'restart'}));
+      expect(VoiceCommandParser.parseCommand('reset game', legalMoves), equals({'action': 'restart'}));
     });
 
     test('ambiguous / unparseable moves return null or error', () {
@@ -1311,5 +1351,60 @@ void main() {
         }
       },
     );
+
+    testWidgets('game commands dispatching on GameScreen', (
+      WidgetTester tester,
+    ) async {
+      tester.view.physicalSize = const Size(800, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      await tester.binding.setSurfaceSize(const Size(800, 1200));
+      addTearDown(() async {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+        await tester.binding.setSurfaceSize(null);
+        await tester.pumpWidget(const SizedBox());
+        await tester.pumpAndSettle();
+      });
+
+      await tester.pumpWidget(const MaterialApp(home: GameScreen()));
+
+      // Play a move first so we can verify reset/restart
+      await tester.tap(find.byKey(const ValueKey('mic_button')));
+      await tester.pump();
+      mockSpeechService.simulateSpeech('e2 e4');
+      await tester.pump(const Duration(milliseconds: 500));
+
+      final boardFinder = find.byType(ChessBoard);
+      var boardWidget = tester.widget<ChessBoard>(boardFinder);
+      expect(boardWidget.chessEngineService.getHistory().length, 1);
+
+      // Now say restart
+      await tester.tap(find.byKey(const ValueKey('mic_button')));
+      await tester.pump();
+      mockSpeechService.simulateSpeech('restart');
+      await tester.pump(const Duration(milliseconds: 500));
+
+      boardWidget = tester.widget<ChessBoard>(boardFinder);
+      expect(boardWidget.chessEngineService.getHistory().length, 0);
+
+      // Test Help command shows dialog
+      await tester.tap(find.byKey(const ValueKey('mic_button')));
+      await tester.pump();
+      mockSpeechService.simulateSpeech('help');
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(find.text('Voice Commands Help'), findsOneWidget);
+      await tester.tap(find.text('Close'));
+      await VoicePipelineService.instance.stopPipeline();
+      await tester.pumpAndSettle();
+
+      // Test Draw offer
+      await tester.tap(find.byKey(const ValueKey('mic_button')));
+      await tester.pump();
+      mockSpeechService.simulateSpeech('draw');
+      await VoicePipelineService.instance.stopPipeline();
+      await tester.pumpAndSettle();
+      expect(find.text('Draw agreed.'), findsOneWidget);
+    });
   });
 }
