@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/section_title.dart';
 import 'game_screen.dart';
 import 'stats_screen.dart';
 import '../services/lichess_service.dart';
 import '../models/lichess_connection_state.dart';
 import 'recent_games_screen.dart';
+import 'online_menu_screen.dart';
 import '../widgets/challenge_bot_dialog.dart';
 import 'speech_test_screen.dart';
 import 'accessibility_settings_screen.dart';
+import 'live_game_screen.dart';
 
 /// [Why widgets are separated]
 /// Separating widgets into different files decomposes large, monolith files into small, single-purpose
@@ -22,11 +25,36 @@ import 'accessibility_settings_screen.dart';
 /// Parent widgets communicate with child widgets by passing arguments (like `title`) into their
 /// constructor when instantiating them.
 ///
-/// [StatelessWidget]
-/// A widget that relies only on configuration properties passed through its constructor. It has no internal,
-/// mutable state that changes during its lifecycle.
-class HomeScreen extends StatelessWidget {
+/// [StatefulWidget]
+/// A widget that has mutable state that can change during its lifecycle.
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkActiveOnlineGame();
+    });
+  }
+
+  Future<void> _checkActiveOnlineGame() async {
+    final prefs = await SharedPreferences.getInstance();
+    final activeGameId = prefs.getString('lichess_active_game_id');
+    if (activeGameId != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LiveGameScreen(gameId: activeGameId),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -239,6 +267,31 @@ class HomeScreen extends StatelessWidget {
                 Text(
                   'Games: ${games ?? "N/A"}  |  Record: ${wins ?? "0"}W / ${losses ?? "0"}L / ${draws ?? "0"}D',
                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  key: const ValueKey('online_gameplay_menu_btn'),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OnlineMenuScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.language),
+                  label: const Text('Online Gameplay Menu'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(

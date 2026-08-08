@@ -14,4 +14,10 @@ enum LichessConnectionState {
 
   /// Network requests failed or offline status detected.
   networkUnavailable,
+
+  /// A reconnection attempt is in progress.
+  reconnecting,
+
+  /// The active token is expired or revoked.
+  authenticationExpired,
 }

@@ -9,6 +9,7 @@ import 'lichess_api_client.dart';
 import 'lichess_auth_service.dart';
 import 'lichess_session_manager.dart';
 import '../repositories/lichess_user_repository.dart';
+import '../models/lichess_online_models.dart';
 
 /// Facade service serving as the top-level Lichess integration interface.
 /// Decouples authentication, storage, API, and repositories while preserving backward compatibility.
@@ -451,6 +452,261 @@ class LichessService with WidgetsBindingObserver {
           controller.close();
         }
       }
+    };
+
+    return controller.stream;
+  }
+
+  /// Creates an open challenge on Lichess.
+  Future<LichessChallenge> createOpenChallenge({
+    required int clockLimit,
+    required int clockIncrement,
+    required String color,
+    required bool rated,
+  }) async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    
+    final response = await _runWithNetworkCheck(() => apiClient.post(
+      '/api/challenge/open',
+      body: 'clock.limit=$clockLimit'
+          '&clock.increment=$clockIncrement'
+          '&color=$color'
+          '&rated=${rated.toString()}'
+          '&variant=standard',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    ));
+    
+    final challengeJson = response['challenge'];
+    if (challengeJson != null) {
+      return LichessChallenge.fromJson(challengeJson);
+    }
+    throw Exception('Lichess response did not contain a valid challenge.');
+  }
+
+  /// Creates a challenge against a specific opponent.
+  Future<LichessChallenge> createOpponentChallenge({
+    required String opponent,
+    required int clockLimit,
+    required int clockIncrement,
+    required String color,
+    required bool rated,
+  }) async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    
+    final response = await _runWithNetworkCheck(() => apiClient.post(
+      '/api/challenge/$opponent',
+      body: 'clock.limit=$clockLimit'
+          '&clock.increment=$clockIncrement'
+          '&color=$color'
+          '&rated=${rated.toString()}'
+          '&variant=standard',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    ));
+    
+    final challengeJson = response['challenge'];
+    if (challengeJson != null) {
+      return LichessChallenge.fromJson(challengeJson);
+    }
+    throw Exception('Lichess response did not contain a valid challenge.');
+  }
+
+  /// Fetches incoming and outgoing challenges.
+  Future<Map<String, List<LichessChallenge>>> fetchChallenges() async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+
+    final response = await _runWithNetworkCheck(() => apiClient.get('/api/challenge'));
+    final incomingList = (response['in'] as List? ?? [])
+        .map((item) => LichessChallenge.fromJson(item as Map<String, dynamic>))
+        .toList();
+    final outgoingList = (response['out'] as List? ?? [])
+        .map((item) => LichessChallenge.fromJson(item as Map<String, dynamic>))
+        .toList();
+
+    return {
+      'in': incomingList,
+      'out': outgoingList,
+    };
+  }
+
+  /// Accepts an incoming challenge.
+  Future<void> acceptChallenge(String challengeId) async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    await _runWithNetworkCheck(() => apiClient.post('/api/challenge/$challengeId/accept'));
+  }
+
+  /// Declines an incoming challenge.
+  Future<void> declineChallenge(String challengeId, {String reason = 'generic'}) async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    await _runWithNetworkCheck(() => apiClient.post(
+      '/api/challenge/$challengeId/decline',
+      body: 'reason=$reason',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+    ));
+  }
+
+  /// Cancels a pending outgoing challenge.
+  Future<void> cancelChallenge(String challengeId) async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    await _runWithNetworkCheck(() => apiClient.post('/api/challenge/$challengeId/cancel'));
+  }
+
+  /// Fetches the user's currently active games.
+  Future<List<LichessActiveGame>> fetchActiveGames() async {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+    
+    final response = await _runWithNetworkCheck(() => apiClient.get('/api/account/playing'));
+    final playing = response['nowPlaying'] as List? ?? [];
+    return playing
+        .map((item) => LichessActiveGame.fromJson(item as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Streams events for the authenticated user, automatically handling keep-alive heartbeats and reconnect backoff.
+  Stream<LichessEvent> streamEvents() {
+    if (accessToken == null) {
+      throw Exception('Not authenticated with Lichess.');
+    }
+
+    final controller = StreamController<LichessEvent>.broadcast();
+    StreamSubscription? subscription;
+    Timer? heartbeatTimer;
+    bool isCancelled = false;
+    int reconnectDelaySec = 1;
+
+    void connect() async {
+      if (isCancelled || controller.isClosed) return;
+
+      try {
+        if (sessionManager.connectionState == LichessConnectionState.networkUnavailable) {
+          sessionManager.setConnectionState(LichessConnectionState.reconnecting);
+        } else if (sessionManager.connectionState == LichessConnectionState.connected) {
+          sessionManager.setConnectionState(LichessConnectionState.reconnecting);
+        }
+
+        final lineStream = await apiClient.stream('/api/stream/event');
+        if (isCancelled || controller.isClosed) return;
+
+        sessionManager.setConnectionState(LichessConnectionState.connected);
+        reconnectDelaySec = 1;
+
+        void resetHeartbeat() {
+          heartbeatTimer?.cancel();
+          heartbeatTimer = Timer(const Duration(seconds: 25), () {
+            debugPrint('Lichess event stream heartbeat timeout. Reconnecting...');
+            subscription?.cancel();
+            heartbeatTimer?.cancel();
+            connect();
+          });
+        }
+
+        resetHeartbeat();
+
+        subscription = lineStream.listen(
+          (line) {
+            resetHeartbeat();
+            final trimmed = line.trim();
+            if (trimmed.isEmpty) return;
+            try {
+              final data = json.decode(trimmed);
+              if (data is Map<String, dynamic>) {
+                final event = LichessEvent.fromJson(data);
+                if (!controller.isClosed) {
+                  controller.add(event);
+                }
+              }
+            } catch (e) {
+              debugPrint('Failed to parse streamed event: $e');
+            }
+          },
+          onError: (error) {
+            debugPrint('Lichess event stream error: $error. Reconnecting...');
+            heartbeatTimer?.cancel();
+            subscription?.cancel();
+            
+            if (error is LichessUnauthorizedException) {
+              sessionManager.setConnectionState(LichessConnectionState.authenticationExpired);
+              if (!controller.isClosed) {
+                controller.addError(error);
+                scheduleMicrotask(() {
+                  if (!controller.isClosed) {
+                    controller.close();
+                  }
+                });
+              }
+              return;
+            }
+
+            if (error is LichessNetworkException) {
+              sessionManager.setConnectionState(LichessConnectionState.networkUnavailable);
+            }
+
+            Future.delayed(Duration(seconds: reconnectDelaySec), () {
+              reconnectDelaySec = (reconnectDelaySec * 2).clamp(1, 60);
+              connect();
+            });
+          },
+          onDone: () {
+            debugPrint('Lichess event stream completed. Reconnecting...');
+            heartbeatTimer?.cancel();
+            subscription?.cancel();
+
+            Future.delayed(Duration(seconds: reconnectDelaySec), () {
+              reconnectDelaySec = (reconnectDelaySec * 2).clamp(1, 60);
+              connect();
+            });
+          },
+          cancelOnError: true,
+        );
+      } catch (e) {
+        debugPrint('Failed to establish Lichess event stream: $e. Reconnecting...');
+        
+        if (e is LichessUnauthorizedException) {
+          sessionManager.setConnectionState(LichessConnectionState.authenticationExpired);
+          if (!controller.isClosed) {
+            controller.addError(e);
+            scheduleMicrotask(() {
+              if (!controller.isClosed) {
+                controller.close();
+              }
+            });
+          }
+          return;
+        }
+
+        if (e is LichessNetworkException) {
+          sessionManager.setConnectionState(LichessConnectionState.networkUnavailable);
+        }
+
+        Future.delayed(Duration(seconds: reconnectDelaySec), () {
+          reconnectDelaySec = (reconnectDelaySec * 2).clamp(1, 60);
+          connect();
+        });
+      }
+    }
+
+    controller.onListen = () {
+      isCancelled = false;
+      connect();
+    };
+
+    controller.onCancel = () {
+      isCancelled = true;
+      heartbeatTimer?.cancel();
+      subscription?.cancel();
     };
 
     return controller.stream;

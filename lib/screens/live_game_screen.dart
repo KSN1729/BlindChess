@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/chess_piece.dart';
 import '../services/chess_engine_service.dart';
 import '../services/lichess_service.dart';
@@ -18,6 +19,13 @@ import '../services/accessibility_settings_service.dart';
 import '../services/tts_service.dart';
 import '../services/haptic_service.dart';
 import '../utils/chess_speech_synthesizer.dart';
+
+enum OnlineConnectionState {
+  connected,
+  reconnecting,
+  syncing,
+  disconnected,
+}
 
 class LiveGameScreen extends StatefulWidget {
   final String gameId;
@@ -38,6 +46,14 @@ class LiveGameScreen extends StatefulWidget {
 class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObserver implements VoicePipelineDelegate {
   final ChessEngineService _chessEngineService = ChessEngineService();
   StreamSubscription<Map<String, dynamic>>? _streamSubscription;
+
+  int _reconnectDelaySec = 2;
+  Timer? _reconnectTimer;
+  bool _myDrawOffered = false;
+  
+  OnlineConnectionState _onlineConnectionState = OnlineConnectionState.reconnecting;
+  int _reconnectAttempts = 0;
+  bool _isConnecting = false;
 
   bool _isLoading = true;
   String? _errorMessage;
@@ -155,6 +171,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     VoicePipelineService.instance.setDelegate(this);
     _clockService = ChessClockService.instance;
     _clockService.addListener(_onClockTick);
+    _saveActiveGameId();
     _startStreaming();
   }
 
@@ -178,31 +195,107 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     }
   }
 
+  Future<void> _saveActiveGameId() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('lichess_active_game_id', widget.gameId);
+    debugPrint('[Resilience] Saved active online game ID: ${widget.gameId}');
+  }
+
+  Future<void> _clearActiveGameId() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('lichess_active_game_id');
+    debugPrint('[Resilience] Cleared active online game ID');
+  }
+
   void _startStreaming({bool isReconnecting = false}) {
+    if (_isConnecting) {
+      debugPrint('[Resilience] Already connecting, ignoring concurrent request to avoid race condition.');
+      return;
+    }
+    _isConnecting = true;
+
+    _reconnectTimer?.cancel();
+
+    if (isReconnecting) {
+      _reconnectAttempts++;
+      if (_reconnectAttempts > 5) {
+        debugPrint('[Resilience] Maximum automatic reconnect attempts (5) reached.');
+        setState(() {
+          _onlineConnectionState = OnlineConnectionState.disconnected;
+          _connectionLost = true;
+          _isLoading = false;
+          _errorMessage = 'Connection failed after 5 attempts.';
+        });
+        TtsService.instance.speak("Connection failed. Please reconnect manually.", priority: AnnouncementPriority.high);
+        _isConnecting = false;
+        return;
+      }
+    } else {
+      _reconnectAttempts = 0;
+    }
+
     setState(() {
+      _onlineConnectionState = OnlineConnectionState.reconnecting;
       if (!isReconnecting) {
         _isLoading = true;
       }
       _errorMessage = null;
-      _connectionLost = false;
+      _connectionLost = true;
     });
 
     _clockService.stop();
     _streamSubscription?.cancel();
-    _streamSubscription = LichessService.instance
-        .streamGameState(widget.gameId)
-        .listen(
-          _handleStreamEvent,
-          onError: _handleStreamError,
-          onDone: _handleStreamDone,
-          cancelOnError: true,
-        );
+
+    try {
+      _streamSubscription = LichessService.instance
+          .streamGameState(widget.gameId)
+          .listen(
+            _handleStreamEvent,
+            onError: _handleStreamError,
+            onDone: _handleStreamDone,
+            cancelOnError: true,
+          );
+    } catch (e) {
+      _handleStreamError(e);
+    } finally {
+      _isConnecting = false;
+    }
+  }
+
+  void _scheduleAutomaticReconnect() {
+    _reconnectTimer?.cancel();
+    if (_gameStatus.startsWith('Game Over') || 
+        _chessEngineService.inCheckmate || 
+        _chessEngineService.inStalemate) {
+      return;
+    }
+    debugPrint('Scheduling automatic reconnect in $_reconnectDelaySec seconds...');
+    _reconnectTimer = Timer(Duration(seconds: _reconnectDelaySec), () {
+      if (!mounted) return;
+      _reconnectDelaySec = (_reconnectDelaySec * 2).clamp(2, 16);
+      _startStreaming(isReconnecting: true);
+    });
   }
 
   void _handleStreamEvent(Map<String, dynamic> event) {
     if (!mounted) return;
 
     final type = event['type'] as String?;
+
+    if (type == 'gameFull' || type == 'gameState') {
+      _reconnectAttempts = 0;
+      _reconnectDelaySec = 2;
+      _reconnectTimer?.cancel();
+
+      final wasLost = _connectionLost || _onlineConnectionState != OnlineConnectionState.connected;
+      if (wasLost) {
+        setState(() {
+          _connectionLost = false;
+          _onlineConnectionState = OnlineConnectionState.connected;
+        });
+        TtsService.instance.speak("Reconnected. Board synchronized.", priority: AnnouncementPriority.high);
+      }
+    }
 
     if (type == 'gameFull') {
       final white = event['white'];
@@ -225,11 +318,15 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       final btime = state['btime'] as int? ?? 0;
       final hasClock = state['wtime'] != null;
 
+      final clockData = event['clock'] ?? {};
+      final limit = clockData['limit'] as int? ?? 0;
+      final increment = clockData['increment'] as int? ?? 0;
+
       _clockService.initialize(
         config: ChessClockConfig(
           label: 'Live Clock',
-          baseSeconds: 0,
-          incrementSeconds: 0,
+          baseSeconds: limit,
+          incrementSeconds: increment,
           hasTimer: hasClock,
         ),
         whiteTimeMs: wtime,
@@ -242,9 +339,23 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
       final wdraw = state['wdraw'] == true;
       final bdraw = state['bdraw'] == true;
-      _opponentDrawOffered = _playerColor == PieceColor.white ? bdraw : wdraw;
+      final myOffer = _playerColor == PieceColor.white ? wdraw : bdraw;
+      final opponentOffer = _playerColor == PieceColor.white ? bdraw : wdraw;
+
+      if (opponentOffer && !_opponentDrawOffered) {
+        _opponentDrawOffered = true;
+        TtsService.instance.speak("Opponent offers a draw.", priority: AnnouncementPriority.high);
+      } else if (!opponentOffer && _opponentDrawOffered) {
+        _opponentDrawOffered = false;
+      }
+
+      if (_myDrawOffered && !myOffer) {
+        _myDrawOffered = false;
+        TtsService.instance.speak("Draw offer declined.", priority: AnnouncementPriority.normal);
+      }
 
       final movesStr = (state['moves'] as String?) ?? '';
+      _reconcileAndVerifyState(movesStr, state);
       _applyMoves(movesStr);
 
       setState(() {
@@ -263,32 +374,83 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
       final wdraw = event['wdraw'] == true;
       final bdraw = event['bdraw'] == true;
-      _opponentDrawOffered = _playerColor == PieceColor.white ? bdraw : wdraw;
+      final myOffer = _playerColor == PieceColor.white ? wdraw : bdraw;
+      final opponentOffer = _playerColor == PieceColor.white ? bdraw : wdraw;
+
+      if (opponentOffer && !_opponentDrawOffered) {
+        _opponentDrawOffered = true;
+        TtsService.instance.speak("Opponent offers a draw.", priority: AnnouncementPriority.high);
+      } else if (!opponentOffer && _opponentDrawOffered) {
+        _opponentDrawOffered = false;
+      }
+
+      if (_myDrawOffered && !myOffer) {
+        _myDrawOffered = false;
+        TtsService.instance.speak("Draw offer declined.", priority: AnnouncementPriority.normal);
+      }
 
       final movesStr = (event['moves'] as String?) ?? '';
+      _reconcileAndVerifyState(movesStr, event);
       _applyMoves(movesStr);
 
       final status = event['status'] as String? ?? 'started';
       final winner = event['winner'] as String?;
       _updateStatus(status, winner);
+    } else if (type == 'opponentGone') {
+      final gone = event['gone'] == true;
+      if (gone) {
+        TtsService.instance.speak("Opponent disconnected.", priority: AnnouncementPriority.high);
+      } else {
+        TtsService.instance.speak("Opponent reconnected.", priority: AnnouncementPriority.high);
+      }
+    }
+  }
+
+  void _reconcileAndVerifyState(String movesStr, Map<String, dynamic> state) {
+    final tempEngine = ChessEngineService();
+    final trimmed = movesStr.trim();
+    if (trimmed.isNotEmpty) {
+      final movesList = trimmed.split(' ');
+      for (final uci in movesList) {
+        if (uci.length >= 4) {
+          tempEngine.makeUciMove(uci);
+        }
+      }
+    }
+
+    final fenMismatch = tempEngine.fen != _chessEngineService.fen;
+    final turnMismatch = tempEngine.activeTurn != _chessEngineService.activeTurn;
+    final countMismatch = (trimmed.isEmpty ? 0 : trimmed.split(' ').length) != _moveCount;
+
+    if (fenMismatch || turnMismatch || countMismatch) {
+      debugPrint('[Resilience] State verification mismatch detected! FEN: $fenMismatch, Turn: $turnMismatch, Count: $countMismatch. Resetting moveCount to force server state reconciliation.');
+      _moveCount = -1; // Forces _applyMoves to fully replay from the server moves
     }
   }
 
   void _applyMoves(String movesStr) {
     final oldMoveCount = _moveCount;
-    _chessEngineService.reset();
-    _lastMoveStart = null;
-    _lastMoveEnd = null;
-
     final trimmed = movesStr.trim();
     if (trimmed.isEmpty) {
-      _moveCount = 0;
-      _updateCheckedKing();
-      if (mounted) setState(() {});
+      if (_moveCount != 0) {
+        _chessEngineService.reset();
+        _moveCount = 0;
+        _lastMoveStart = null;
+        _lastMoveEnd = null;
+        _updateCheckedKing();
+        if (mounted) setState(() {});
+      }
       return;
     }
 
     final movesList = trimmed.split(' ');
+    if (movesList.length == _moveCount) {
+      return;
+    }
+
+    _chessEngineService.reset();
+    _lastMoveStart = null;
+    _lastMoveEnd = null;
     Map<String, dynamic>? executedMove;
     for (int i = 0; i < movesList.length; i++) {
       final uci = movesList[i];
@@ -368,24 +530,65 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       'outoftime',
       'cheat',
       'variantEnd',
+      'aborted',
     };
     final isGameOver = terminalStatuses.contains(status.toLowerCase());
 
     if (isGameOver && !_isGameStatsRecorded) {
+      _clearActiveGameId();
       _isGameStatsRecorded = true;
+      _clockService.stop();
+      _reconnectTimer?.cancel();
+
+      // Audio & Haptic GameOver feedback
+      AudioService.instance.playGameOver();
+      HapticService.triggerGameOver();
+
       final isDrawResult = (winner == null);
 
-      StatisticsService.instance.recordGame(
-        isDraw: isDrawResult,
-        winningColor: winner,
-        isCheckmate: status.toLowerCase() == 'mate',
-        halfMoves: _moveCount,
-        isBlindfoldModeActive: isBlindfoldMode,
-        memoryScorePercentage: isBlindfoldMode
-            ? (totalGuesses > 0 ? (correctGuesses * 100 ~/ totalGuesses) : 0)
-            : null,
-        isOnline: true,
-      );
+      if (status.toLowerCase() != 'aborted') {
+        StatisticsService.instance.recordGame(
+          isDraw: isDrawResult,
+          winningColor: winner,
+          isCheckmate: status.toLowerCase() == 'mate',
+          halfMoves: _moveCount,
+          isBlindfoldModeActive: isBlindfoldMode,
+          memoryScorePercentage: isBlindfoldMode
+              ? (totalGuesses > 0 ? (correctGuesses * 100 ~/ totalGuesses) : 0)
+              : null,
+          isOnline: true,
+        );
+      }
+
+      final myColorName = _playerColor == PieceColor.white ? 'white' : 'black';
+      final isWinner = winner == myColorName;
+      String ttsText = 'Game over.';
+
+      switch (status.toLowerCase()) {
+        case 'mate':
+          ttsText = isWinner ? 'Checkmate. You win!' : 'Checkmate. Opponent wins.';
+          break;
+        case 'resign':
+          ttsText = isWinner ? 'Opponent resigned. You win!' : 'You resigned. Opponent wins.';
+          break;
+        case 'draw':
+          ttsText = 'Draw by agreement.';
+          break;
+        case 'stalemate':
+          ttsText = 'Stalemate. Draw.';
+          break;
+        case 'timeout':
+        case 'outoftime':
+          ttsText = isWinner ? 'Time forfeit. You win!' : 'Time forfeit. Opponent wins.';
+          break;
+        case 'aborted':
+          ttsText = 'Game aborted.';
+          break;
+        default:
+          ttsText = 'Game over.';
+      }
+
+      TtsService.instance.speak(ttsText, priority: AnnouncementPriority.high);
     }
 
     setState(() {
@@ -415,19 +618,32 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     if (error is LichessNetworkException) {
       LichessService.instance.sessionManager.setConnectionState(LichessConnectionState.networkUnavailable);
     }
+    _clockService.stop();
+    final wasLost = _connectionLost;
     setState(() {
       _isLoading = false;
       _connectionLost = true;
       _errorMessage = LichessService.formatError(error);
     });
+    if (!wasLost) {
+      TtsService.instance.speak("Connection lost. Reconnecting.", priority: AnnouncementPriority.high);
+    }
+    _scheduleAutomaticReconnect();
   }
 
   void _handleStreamDone() {
     if (!mounted) return;
+    _clockService.stop();
+    final wasLost = _connectionLost;
     setState(() {
       _isLoading = false;
       _connectionLost = true;
+      _errorMessage = 'Stream completed.';
     });
+    if (!wasLost) {
+      TtsService.instance.speak("Connection lost. Reconnecting.", priority: AnnouncementPriority.high);
+    }
+    _scheduleAutomaticReconnect();
   }
 
 
@@ -450,6 +666,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
   }
 
   void _handleMidGameExit() {
+    _clearActiveGameId();
     if (!_isLoading &&
         !_isGameStatsRecorded &&
         !_gameStatus.startsWith('Game Over')) {
@@ -481,8 +698,17 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     _clockService.stop();
     _streamSubscription?.cancel();
     _revealTimer?.cancel();
+    _reconnectTimer?.cancel();
     super.dispose();
   }
+
+  // Public members for testing
+  int get moveCount => _moveCount;
+  OnlineConnectionState get onlineConnectionState => _onlineConnectionState;
+  int get reconnectDelaySec => _reconnectDelaySec;
+  void simulateStreamError(dynamic error) => _handleStreamError(error);
+  void simulateStreamDone() => _handleStreamDone();
+  void simulateManualExit() => _handleMidGameExit();
 
   /// Displays an alert dialog with options to choose the piece type to promote the pawn to.
   Future<String?> _showPromotionDialog(PieceColor color) {
@@ -859,6 +1085,8 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
     int toCol, {
     String? promotion,
   }) {
+    if (_isSendingMove) return;
+
     final fromFile = String.fromCharCode('a'.codeUnitAt(0) + fromCol);
     final fromRank = (8 - fromRow).toString();
     final toFile = String.fromCharCode('a'.codeUnitAt(0) + toCol);
@@ -893,13 +1121,17 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
             success: false,
             error: 'Move rejected: ${err.toString()}',
           );
+          AudioService.instance.playIllegalMove();
+          HapticService.triggerIllegalMove();
+          final formattedErr = LichessService.formatError(err);
+          TtsService.instance.speak("Move rejected: $formattedErr", priority: AnnouncementPriority.high);
           setState(() {
             _isSendingMove = false;
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Move rejected: ${LichessService.formatError(err)}',
+                'Move rejected: $formattedErr',
               ),
               backgroundColor: Colors.red[800],
             ),
@@ -972,6 +1204,82 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       return isDark ? Colors.white : Colors.grey[800]!;
     }
 
+    Widget? connectionBanner;
+    if (_onlineConnectionState == OnlineConnectionState.reconnecting) {
+      connectionBanner = Container(
+        color: Colors.orange[850],
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Reconnecting to Lichess... (Attempt $_reconnectAttempts of 5)',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    } else if (_onlineConnectionState == OnlineConnectionState.syncing) {
+      connectionBanner = Container(
+        color: Colors.blue[800],
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text(
+              'Syncing game state with Lichess...',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            ),
+          ],
+        ),
+      );
+    } else if (_onlineConnectionState == OnlineConnectionState.disconnected) {
+      connectionBanner = Container(
+        color: Colors.red[800],
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Row(
+          children: [
+            const Icon(Icons.wifi_off, color: Colors.white, size: 18),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Text(
+                'You are offline. Connection failed.',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+              ),
+            ),
+            ElevatedButton.icon(
+              onPressed: () => _startStreaming(isReconnecting: false),
+              icon: const Icon(Icons.refresh, size: 14),
+              label: const Text('Retry', style: TextStyle(fontSize: 11)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.red[800],
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return PopScope(
       canPop: true,
       onPopInvokedWithResult: (didPop, result) {
@@ -981,7 +1289,24 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Lichess Live Game'),
+          title: Row(
+            children: [
+              const Text('Lichess Live Game'),
+              const SizedBox(width: 8),
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _onlineConnectionState == OnlineConnectionState.connected
+                      ? Colors.green
+                      : (_onlineConnectionState == OnlineConnectionState.disconnected
+                          ? Colors.red
+                          : Colors.orange),
+                ),
+              ),
+            ],
+          ),
           backgroundColor: theme.colorScheme.inversePrimary,
           actions: [
             if (!_isLoading &&
@@ -1082,6 +1407,7 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
             : SafeArea(
                 child: Column(
                   children: [
+                    ?connectionBanner,
                     // Opponent stats header card
                     Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -1613,6 +1939,15 @@ class _LiveGameScreenState extends State<LiveGameScreen> with WidgetsBindingObse
 
   @override
   bool makeMove(int fromRow, int fromCol, int toRow, int toCol, {String? promotion}) {
+    final isMyTurn =
+        !_isLoading &&
+        !_connectionLost &&
+        !_gameStatus.startsWith('Game Over') &&
+        _chessEngineService.activeTurn == _playerColor;
+
+    if (!isMyTurn || _isSendingMove) {
+      return false;
+    }
     _transmitMove(fromRow, fromCol, toRow, toCol, promotion: promotion);
     return true;
   }
